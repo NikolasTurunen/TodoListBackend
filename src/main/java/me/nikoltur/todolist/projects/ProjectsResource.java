@@ -1,6 +1,8 @@
 package me.nikoltur.todolist.projects;
 
+import java.util.List;
 import me.nikoltur.todolist.projects.da.Project;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectsResource {
 
     private static final String BASE_PATH = "/projects";
+    @Autowired
+    private ProjectsService projectsService;
 
     /**
      * Returns a list of all projects.
@@ -22,8 +26,8 @@ public class ProjectsResource {
      * @return A list of all projects.
      */
     @GetMapping(BASE_PATH)
-    public Project getProjects() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<Project> getProjects() {
+        return projectsService.getProjects();
     }
 
     /**
