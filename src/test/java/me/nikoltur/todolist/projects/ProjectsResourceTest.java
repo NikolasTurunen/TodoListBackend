@@ -1,6 +1,10 @@
 package me.nikoltur.todolist.projects;
 
+import java.util.ArrayList;
+import java.util.List;
 import me.nikoltur.todolist.Application;
+import me.nikoltur.todolist.projects.da.Project;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +38,16 @@ public class ProjectsResourceTest {
         projectsResource = new ProjectsResource();
 
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void testGetProjects() {
+        List<Project> list = new ArrayList<>();
+        Mockito.when(projectsService.getProjects()).thenReturn(list);
+
+        List<Project> projects = projectsResource.getProjects();
+
+        Assert.assertSame("Returned list should match the list that is returned from the service", list, projects);
     }
 
     @Test
