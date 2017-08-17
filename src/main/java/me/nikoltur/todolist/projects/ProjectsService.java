@@ -21,6 +21,8 @@ public interface ProjectsService {
      * Creates a new project with the specified name.
      *
      * @param name Name of the project to be created.
+     * @throws NullPointerException Thrown if the specified name is null.
+     * @throws IllegalArgumentException Thrown if the specified name is empty.
      */
     public void createProject(String name);
 }

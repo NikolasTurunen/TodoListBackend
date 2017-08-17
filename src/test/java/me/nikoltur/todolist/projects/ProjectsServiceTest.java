@@ -60,7 +60,7 @@ public class ProjectsServiceTest {
     }
 
     @Test
-    public void testCreateProject() {
+    public void testCreateProjectCreatesProject() {
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
 
@@ -69,5 +69,15 @@ public class ProjectsServiceTest {
         projectsService.createProject(projectName);
         Mockito.verify(projectsDao, times(1)).save(anyObject());
         Assert.assertEquals("Project name should be equal to the specified", projectName, argumentCaptor.getValue().getName());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateProjectThrowsForNullName() {
+        projectsService.createProject(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateProjectThrowsForEmptyName() {
+        projectsService.createProject("");
     }
 }

@@ -24,6 +24,14 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     public void createProject(String name) {
+        if (name == null) {
+            throw new NullPointerException("The specified name must not be null");
+        }
+
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The specified name must not be empty");
+        }
+
         Project project = new Project();
         project.setName(name);
         projectsDao.save(project);
