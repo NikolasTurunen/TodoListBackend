@@ -30,6 +30,7 @@ public class ProjectsDaoImpl implements ProjectsDao {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void save(Project project) {
         Session session = sessionFactory.getCurrentSession();
         session.save(project);

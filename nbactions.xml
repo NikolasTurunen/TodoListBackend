@@ -43,4 +43,12 @@
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-Integration test</actionName>
+            <displayName>Integration test</displayName>
+            <goals>
+                <goal>integration-test</goal>
+            </goals>
+        </action>
+        
     </actions>
