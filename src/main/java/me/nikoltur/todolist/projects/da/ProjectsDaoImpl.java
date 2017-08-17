@@ -28,4 +28,10 @@ public class ProjectsDaoImpl implements ProjectsDao {
 
         return query.getResultList();
     }
+
+    @Override
+    public void save(Project project) {
+        Session session = sessionFactory.getCurrentSession();
+        session.save(project);
+    }
 }

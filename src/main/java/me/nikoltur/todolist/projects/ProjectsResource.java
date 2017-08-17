@@ -31,13 +31,13 @@ public class ProjectsResource {
     }
 
     /**
-     * Adds a new project with the specified name.
+     * Creates a new project with the specified name.
      *
      * @param name Name of the project to be added.
      */
-    @PostMapping(BASE_PATH + "/add")
-    public void addProject(@RequestParam("name") String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    @PostMapping(BASE_PATH + "/create")
+    public void createProject(@RequestParam("name") String name) {
+        projectsService.createProject(name);
     }
 
     /**

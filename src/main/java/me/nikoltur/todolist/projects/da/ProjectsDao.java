@@ -15,4 +15,11 @@ public interface ProjectsDao {
      * @return A list containing all projects.
      */
     public List<Project> getAll();
+
+    /**
+     * Saves the specified project.
+     *
+     * @param project Project to be saved.
+     */
+    public void save(Project project);
 }

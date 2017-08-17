@@ -21,4 +21,11 @@ public class ProjectsServiceImpl implements ProjectsService {
     public List<Project> getProjects() {
         return projectsDao.getAll();
     }
+
+    @Override
+    public void createProject(String name) {
+        Project project = new Project();
+        project.setName(name);
+        projectsDao.save(project);
+    }
 }

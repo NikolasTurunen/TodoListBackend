@@ -9,9 +9,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -54,5 +57,17 @@ public class ProjectsServiceTest {
         Assert.assertEquals("Size should be 1", 1, projectsService.getProjects().size());
 
         Assert.assertSame("Project should match", project, projectsService.getProjects().get(0));
+    }
+
+    @Test
+    public void testCreateProject() {
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
+
+        String projectName = "Test";
+
+        projectsService.createProject(projectName);
+        Mockito.verify(projectsDao, times(1)).save(anyObject());
+        Assert.assertEquals("Project name should be equal to the specified", projectName, argumentCaptor.getValue().getName());
     }
 }

@@ -16,4 +16,11 @@ public interface ProjectsService {
      * @return A list containing all projects.
      */
     public List<Project> getProjects();
+
+    /**
+     * Creates a new project with the specified name.
+     *
+     * @param name Name of the project to be created.
+     */
+    public void createProject(String name);
 }
