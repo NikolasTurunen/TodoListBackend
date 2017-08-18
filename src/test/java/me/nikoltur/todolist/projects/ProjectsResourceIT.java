@@ -1,11 +1,9 @@
 package me.nikoltur.todolist.projects;
 
 import java.util.List;
-import javax.persistence.Query;
 import me.nikoltur.todolist.Application;
+import me.nikoltur.todolist.DatabaseWiper;
 import me.nikoltur.todolist.projects.da.Project;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,40 +23,13 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class ProjectsResourceIT {
 
     @Autowired
-    private SessionFactory sessionFactory;
+    private DatabaseWiper databaseWiper;
     @Autowired
     private ProjectsResource projectsResource;
 
     @Before
     public void setUp() {
-        deleteProjects();
-        restartProjectsSequence();
-    }
-
-    /**
-     * Deletes all projects.
-     */
-    private void deleteProjects() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query deleteQuery = session.createNativeQuery("delete from projects");
-            deleteQuery.executeUpdate();
-
-            session.getTransaction().commit();
-        }
-    }
-
-    /**
-     * Restarts the id sequence of projects.
-     */
-    private void restartProjectsSequence() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query restartSequenceQuery = session.createNativeQuery("alter sequence projects_id_seq restart");
-            restartSequenceQuery.executeUpdate();
-
-            session.getTransaction().commit();
-        }
+        databaseWiper.wipeDatabase();
     }
 
     @Test
