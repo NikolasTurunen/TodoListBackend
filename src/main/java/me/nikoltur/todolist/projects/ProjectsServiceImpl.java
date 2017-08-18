@@ -35,6 +35,11 @@ public class ProjectsServiceImpl implements ProjectsService {
             throw new IllegalArgumentException("The specified name must not be empty");
         }
 
+        Project existingProject = projectsDao.getByName(name);
+        if (existingProject != null) {
+            throw new ProjectAlreadyExistsException("Project with the name " + name + " already exists");
+        }
+
         Project project = new Project();
         project.setName(name);
         projectsDao.save(project);

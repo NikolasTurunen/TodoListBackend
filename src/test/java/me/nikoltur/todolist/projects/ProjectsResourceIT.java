@@ -79,6 +79,18 @@ public class ProjectsResourceIT {
     }
 
     @Test
+    public void testCreateThrowsIfProjectAlreadyExists() {
+        String projectName = "Testitall";
+        projectsResource.createProject(projectName);
+        try {
+            projectsResource.createProject(projectName);
+            Assert.fail();
+        } catch (ProjectAlreadyExistsException ex) {
+            Assert.assertSame("Should throw ProjectAlreadyExistsException if a project with the same name already exists", ProjectAlreadyExistsException.class, ex.getClass());
+        }
+    }
+
+    @Test
     public void testRemoveProject() {
         String nameOfProjectToBeRemoved = "p2";
         projectsResource.createProject("p1");

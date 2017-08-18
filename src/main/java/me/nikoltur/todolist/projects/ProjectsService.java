@@ -21,6 +21,7 @@ public interface ProjectsService {
      * Creates a new project with the specified name.
      *
      * @param name Name of the project to be created.
+     * @throws ProjectAlreadyExistsException Thrown if a project with the specified name already exists.
      * @throws NullPointerException Thrown if the specified name is null.
      * @throws IllegalArgumentException Thrown if the specified name is empty.
      */

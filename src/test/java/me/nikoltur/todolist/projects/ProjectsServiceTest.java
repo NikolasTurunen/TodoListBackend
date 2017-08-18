@@ -79,6 +79,23 @@ public class ProjectsServiceTest {
     }
 
     @Test
+    public void testCreateProjectThrowsIfProjectAlreadyExists() {
+        String projectName = "Testtt";
+
+        Project project = new Project();
+        project.setName(projectName);
+
+        projectsService.createProject(projectName);
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+        try {
+            projectsService.createProject(projectName);
+            Assert.fail();
+        } catch (ProjectAlreadyExistsException ex) {
+            Assert.assertSame("Should throw ProjectAlreadyExistsException if a project with the same name already exists", ProjectAlreadyExistsException.class, ex.getClass());
+        }
+    }
+
+    @Test
     public void testRemoveProject() {
         String projectName = "Testit";
 
