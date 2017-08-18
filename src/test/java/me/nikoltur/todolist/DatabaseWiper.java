@@ -49,7 +49,7 @@ public class DatabaseWiper {
     }
 
     /**
-     * Deletes all projects.
+     * Deletes all tasks.
      */
     private void deleteTasks() {
         try (Session session = sessionFactory.openSession()) {
@@ -62,7 +62,7 @@ public class DatabaseWiper {
     }
 
     /**
-     * Restarts the id sequence of projects.
+     * Restarts the id sequence of tasks.
      */
     private void restartTasksSequence() {
         try (Session session = sessionFactory.openSession()) {
