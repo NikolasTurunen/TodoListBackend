@@ -17,9 +17,24 @@ public interface ProjectsDao {
     public List<Project> getAll();
 
     /**
+     * Returns the project with the specified name. Null if no project with the specified name exists.
+     *
+     * @param name Name of the project to get.
+     * @return The project with the specified name if it exists. Null otherwise.
+     */
+    public Project getByName(String name);
+
+    /**
      * Saves the specified project.
      *
      * @param project Project to be saved.
      */
     public void save(Project project);
+
+    /**
+     * Removes the specified project.
+     *
+     * @param project Project to be removed.
+     */
+    public void remove(Project project);
 }

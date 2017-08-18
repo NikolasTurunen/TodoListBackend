@@ -57,4 +57,12 @@ public class ProjectsResourceTest {
 
         Mockito.verify(projectsService, times(1)).createProject(projectName);
     }
+
+    @Test
+    public void testRemoveProject() {
+        String projectName = "Tested";
+        projectsResource.removeProject(projectName);
+
+        Mockito.verify(projectsService, times(1)).removeProject(projectName);
+    }
 }

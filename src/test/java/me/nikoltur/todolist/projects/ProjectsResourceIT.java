@@ -77,4 +77,29 @@ public class ProjectsResourceIT {
         Assert.assertEquals("Name of first project should match", projectName, projects.get(0).getName());
         Assert.assertEquals("Id of first project should match", 1, projects.get(0).getId());
     }
+
+    @Test
+    public void testRemoveProject() {
+        String nameOfProjectToBeRemoved = "p2";
+        projectsResource.createProject("p1");
+        projectsResource.createProject(nameOfProjectToBeRemoved);
+
+        projectsResource.removeProject(nameOfProjectToBeRemoved);
+
+        List<Project> projects = projectsResource.getProjects();
+        Assert.assertEquals("Size should be 1", 1, projects.size());
+        Assert.assertNotEquals("Name of the single project left should not be the same as of the removed project", nameOfProjectToBeRemoved, projects.get(0).getName());
+    }
+
+    @Test
+    public void testRemoveProjectThrowsIfProjectDoesNotExist() {
+        String projectName = "p";
+
+        try {
+            projectsResource.removeProject(projectName);
+            Assert.fail();
+        } catch (ProjectDoesNotExistException ex) {
+            Assert.assertSame("Should throw ProjectDoesNotExistException if a project with the specified name does not exist", ProjectDoesNotExistException.class, ex.getClass());
+        }
+    }
 }

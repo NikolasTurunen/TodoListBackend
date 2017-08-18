@@ -47,7 +47,7 @@ public class ProjectsResource {
      */
     @PostMapping(BASE_PATH + "/remove")
     public void removeProject(@RequestParam("name") String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        projectsService.removeProject(name);
     }
 
     /**

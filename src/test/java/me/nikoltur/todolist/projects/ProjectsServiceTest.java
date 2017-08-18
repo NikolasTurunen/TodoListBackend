@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -30,10 +29,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(classes = Application.class)
 public class ProjectsServiceTest {
 
-    @Autowired
     @InjectMocks
-    private ProjectsService projectsService;
-    @Autowired
+    private ProjectsService projectsService = new ProjectsServiceImpl();
     @Mock
     private ProjectsDao projectsDao;
 
@@ -79,5 +76,46 @@ public class ProjectsServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testCreateProjectThrowsForEmptyName() {
         projectsService.createProject("");
+    }
+
+    @Test
+    public void testRemoveProject() {
+        String projectName = "Testit";
+
+        Project project = new Project();
+        project.setName(projectName);
+
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).remove(argumentCaptor.capture());
+
+        projectsService.removeProject(projectName);
+        Mockito.verify(projectsDao, times(1)).remove(anyObject());
+        Assert.assertEquals("Project name should be equal to the specified", projectName, argumentCaptor.getValue().getName());
+    }
+
+    @Test
+    public void testRemoveProjectThrowsWhenProjectDoesNotExist() {
+        String projectName = "Testa";
+        Mockito.doReturn(null).when(projectsDao).getByName(projectName);
+        Mockito.doNothing().when(projectsDao).remove(anyObject());
+
+        try {
+            projectsService.removeProject(projectName);
+            Assert.fail(); // Fail if no exception is caught.
+        } catch (ProjectDoesNotExistException ex) {
+            Assert.assertSame("Exception type should be ProjectDoesNotExistException", ProjectDoesNotExistException.class, ex.getClass());
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testRemoveProjectThrowsForNullName() {
+        projectsService.removeProject(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveProjectThrowsForEmptyName() {
+        projectsService.removeProject("");
     }
 }

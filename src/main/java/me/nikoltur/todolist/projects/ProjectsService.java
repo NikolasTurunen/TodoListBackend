@@ -25,4 +25,14 @@ public interface ProjectsService {
      * @throws IllegalArgumentException Thrown if the specified name is empty.
      */
     public void createProject(String name);
+
+    /**
+     * Removes the project with the specified name.
+     *
+     * @param name Name of the project to be removed.
+     * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
+     * @throws NullPointerException Thrown if the specified name is null.
+     * @throws IllegalArgumentException Thrown if the specified name is empty.
+     */
+    public void removeProject(String name);
 }
