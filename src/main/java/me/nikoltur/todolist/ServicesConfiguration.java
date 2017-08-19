@@ -1,5 +1,6 @@
 package me.nikoltur.todolist;
 
+import me.nikoltur.todolist.projects.ProjectsService;
 import me.nikoltur.todolist.projects.ProjectsServiceImpl;
 import me.nikoltur.todolist.tasks.TasksService;
 import me.nikoltur.todolist.tasks.TasksServiceImpl;
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
 public class ServicesConfiguration {
 
     @Bean
-    public ProjectsServiceImpl projectsService() {
+    public ProjectsService projectsService() {
         return new ProjectsServiceImpl();
     }
 
