@@ -15,62 +15,50 @@ public class DatabaseWiper {
     private SessionFactory sessionFactory;
 
     public void wipeDatabase() {
-        deleteProjects();
-        restartProjectsSequence();
-
-        deleteTasks();
-        restartTasksSequence();
-    }
-
-    /**
-     * Deletes all projects.
-     */
-    private void deleteProjects() {
         try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Query deleteQuery = session.createNativeQuery("delete from projects");
-            deleteQuery.executeUpdate();
+            try {
+                deleteTasks(session);
+                restartTasksSequence(session);
 
-            session.getTransaction().commit();
-        }
-    }
-
-    /**
-     * Restarts the id sequence of projects.
-     */
-    private void restartProjectsSequence() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query restartSequenceQuery = session.createNativeQuery("alter sequence projects_id_seq restart");
-            restartSequenceQuery.executeUpdate();
-
-            session.getTransaction().commit();
+                deleteProjects(session);
+                restartProjectsSequence(session);
+            } catch (Exception ex) {
+                session.getTransaction().rollback();
+                throw new RuntimeException("Failed to wipe the database", ex);
+            }
         }
     }
 
     /**
      * Deletes all tasks.
      */
-    private void deleteTasks() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query deleteQuery = session.createNativeQuery("delete from tasks");
-            deleteQuery.executeUpdate();
-
-            session.getTransaction().commit();
-        }
+    private void deleteTasks(Session session) {
+        Query deleteQuery = session.createNativeQuery("delete from tasks");
+        deleteQuery.executeUpdate();
     }
 
     /**
      * Restarts the id sequence of tasks.
      */
-    private void restartTasksSequence() {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-            Query restartSequenceQuery = session.createNativeQuery("alter sequence tasks_id_seq restart");
-            restartSequenceQuery.executeUpdate();
+    private void restartTasksSequence(Session session) {
+        Query restartSequenceQuery = session.createNativeQuery("alter sequence tasks_id_seq restart");
+        restartSequenceQuery.executeUpdate();
+    }
 
-            session.getTransaction().commit();
-        }
+    /**
+     * Deletes all projects.
+     */
+    private void deleteProjects(Session session) {
+        Query deleteQuery = session.createNativeQuery("delete from projects");
+        deleteQuery.executeUpdate();
+    }
+
+    /**
+     * Restarts the id sequence of projects.
+     */
+    private void restartProjectsSequence(Session session) {
+        Query restartSequenceQuery = session.createNativeQuery("alter sequence projects_id_seq restart");
+        restartSequenceQuery.executeUpdate();
     }
 }
