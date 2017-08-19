@@ -31,6 +31,12 @@ public class TasksResource {
         return tasksService.getTasks(projectId);
     }
 
+    /**
+     * Creates a new task for the specified project.
+     *
+     * @param projectId Id of the project.
+     * @param task Task as a string.
+     */
     @PostMapping(BASE_PATH + "/create")
     public void createTask(@RequestParam("projectId") int projectId, @RequestParam("task") String task) {
         tasksService.createTask(projectId, task);
