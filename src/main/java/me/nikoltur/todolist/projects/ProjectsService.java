@@ -32,6 +32,7 @@ public interface ProjectsService {
      *
      * @param name Name of the project to be removed.
      * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
+     * @throws ProjectHasTasksException Thrown if the project with the specified name still has tasks referencing to it.
      * @throws NullPointerException Thrown if the specified name is null.
      * @throws IllegalArgumentException Thrown if the specified name is empty.
      */

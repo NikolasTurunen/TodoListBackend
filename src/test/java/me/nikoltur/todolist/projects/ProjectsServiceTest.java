@@ -5,12 +5,15 @@ import java.util.List;
 import me.nikoltur.todolist.Application;
 import me.nikoltur.todolist.projects.da.Project;
 import me.nikoltur.todolist.projects.da.ProjectsDao;
+import me.nikoltur.todolist.tasks.da.Task;
+import me.nikoltur.todolist.tasks.da.TasksDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -33,6 +36,8 @@ public class ProjectsServiceTest {
     private ProjectsService projectsService = new ProjectsServiceImpl();
     @Mock
     private ProjectsDao projectsDao;
+    @Mock
+    private TasksDao tasksDao;
 
     public ProjectsServiceTest() {
     }
@@ -107,6 +112,8 @@ public class ProjectsServiceTest {
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).remove(argumentCaptor.capture());
 
+        Mockito.doReturn(new ArrayList<>()).when(tasksDao).getAllOf(project.getId());
+
         projectsService.removeProject(projectName);
         Mockito.verify(projectsDao, times(1)).remove(anyObject());
         Assert.assertEquals("Project name should be equal to the specified", projectName, argumentCaptor.getValue().getName());
@@ -134,5 +141,24 @@ public class ProjectsServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void testRemoveProjectThrowsForEmptyName() {
         projectsService.removeProject("");
+    }
+
+    @Test(expected = ProjectHasTasksException.class)
+    public void testRemoveProjectThrowsIfProjectHasTasks() {
+        String projectName = "Project name";
+
+        Project project = new Project();
+        project.setName(projectName);
+
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+
+        List<Task> tasks = new ArrayList<>();
+        Task task = new Task();
+        task.setProjectId(1);
+        task.setTaskString("Task string");
+        tasks.add(task);
+
+        Mockito.doReturn(tasks).when(tasksDao).getAllOf(anyInt());
+        projectsService.removeProject(projectName);
     }
 }

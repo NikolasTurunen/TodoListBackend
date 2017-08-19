@@ -4,6 +4,7 @@ import java.util.List;
 import me.nikoltur.todolist.Application;
 import me.nikoltur.todolist.DatabaseWiper;
 import me.nikoltur.todolist.projects.ProjectDoesNotExistException;
+import me.nikoltur.todolist.projects.ProjectHasTasksException;
 import me.nikoltur.todolist.projects.ProjectsResource;
 import me.nikoltur.todolist.projects.da.Project;
 import me.nikoltur.todolist.tasks.da.Task;
@@ -60,5 +61,13 @@ public class TaskAndProjectResourcesIT {
     @Test(expected = ProjectDoesNotExistException.class)
     public void testCreateTaskForProjectThatDoesNotExist() {
         tasksResource.createTask(123, "Test");
+    }
+
+    @Test(expected = ProjectHasTasksException.class)
+    public void testProjectRemovalWithTasks() {
+        projectsResource.createProject("Myproject");
+        Project project = projectsResource.getProjects().get(0);
+        tasksResource.createTask(project.getId(), "Mytask");
+        projectsResource.removeProject(project.getName());
     }
 }

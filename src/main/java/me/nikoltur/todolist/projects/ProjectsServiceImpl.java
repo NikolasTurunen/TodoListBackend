@@ -4,6 +4,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 import me.nikoltur.todolist.projects.da.Project;
 import me.nikoltur.todolist.projects.da.ProjectsDao;
+import me.nikoltur.todolist.tasks.da.TasksDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,8 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Autowired
     private ProjectsDao projectsDao;
+    @Autowired
+    private TasksDao tasksDao;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -59,6 +62,10 @@ public class ProjectsServiceImpl implements ProjectsService {
         Project project = projectsDao.getByName(name);
         if (project == null) {
             throw new ProjectDoesNotExistException("Project with the name " + name + " does not exist");
+        }
+
+        if (!tasksDao.getAllOf(project.getId()).isEmpty()) {
+            throw new ProjectHasTasksException("Project with the name " + name + " cannot be removed because there are tasks referencing to it");
         }
 
         projectsDao.remove(project);
