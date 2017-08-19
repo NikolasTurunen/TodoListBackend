@@ -24,6 +24,7 @@ public interface TasksService {
      *
      * @param projectId Id of the project the task is going to be created for.
      * @param taskString Task.
+     * @throws ProjectDoesNotExistException Thrown if a project with the specified projectId does not exist.
      * @throws IllegalArgumentException Thrown if the specified projectId is negative or zero.
      * @throws NullPointerException Thrown if the specified task is null.
      */

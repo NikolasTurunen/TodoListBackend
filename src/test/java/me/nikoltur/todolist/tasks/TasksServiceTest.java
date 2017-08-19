@@ -2,6 +2,8 @@ package me.nikoltur.todolist.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.nikoltur.todolist.projects.ProjectDoesNotExistException;
+import me.nikoltur.todolist.projects.da.ProjectsDao;
 import me.nikoltur.todolist.tasks.da.Task;
 import me.nikoltur.todolist.tasks.da.TasksDao;
 import org.junit.Assert;
@@ -24,6 +26,8 @@ public class TasksServiceTest {
     private TasksService tasksService = new TasksServiceImpl();
     @Mock
     private TasksDao tasksDao;
+    @Mock
+    private ProjectsDao projectsDao;
 
     @Before
     public void initMocks() {
@@ -71,12 +75,13 @@ public class TasksServiceTest {
 
     @Test
     public void testCreateTask() {
-        ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
-
-        Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
-
         int projectId = 1;
         String taskString = "Hello world";
+
+        ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
+
+        Mockito.doReturn(true).when(projectsDao).exists(projectId);
 
         tasksService.createTask(projectId, taskString);
 
@@ -113,5 +118,12 @@ public class TasksServiceTest {
         String taskString = null;
 
         tasksService.createTask(projectId, taskString);
+    }
+
+    @Test(expected = ProjectDoesNotExistException.class)
+    public void testCreateTaskThrowsForNonExistingProject() {
+        Mockito.doReturn(false).when(projectsDao).exists(anyInt());
+
+        tasksService.createTask(1243, "");
     }
 }

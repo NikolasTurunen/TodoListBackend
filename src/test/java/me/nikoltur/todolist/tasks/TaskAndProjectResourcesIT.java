@@ -3,6 +3,7 @@ package me.nikoltur.todolist.tasks;
 import java.util.List;
 import me.nikoltur.todolist.Application;
 import me.nikoltur.todolist.DatabaseWiper;
+import me.nikoltur.todolist.projects.ProjectDoesNotExistException;
 import me.nikoltur.todolist.projects.ProjectsResource;
 import me.nikoltur.todolist.projects.da.Project;
 import me.nikoltur.todolist.tasks.da.Task;
@@ -54,5 +55,10 @@ public class TaskAndProjectResourcesIT {
         Assert.assertEquals("Id of the single task should be 1", 1, task.getId());
         Assert.assertEquals("Project id of the single task should match the created task", project.getId(), task.getProjectId());
         Assert.assertEquals("Task string of the single task should match the created task", taskString, task.getTaskString());
+    }
+
+    @Test(expected = ProjectDoesNotExistException.class)
+    public void testCreateTaskForProjectThatDoesNotExist() {
+        tasksResource.createTask(123, "Test");
     }
 }

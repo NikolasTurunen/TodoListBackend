@@ -2,6 +2,8 @@ package me.nikoltur.todolist.tasks;
 
 import java.util.List;
 import javax.transaction.Transactional;
+import me.nikoltur.todolist.projects.ProjectDoesNotExistException;
+import me.nikoltur.todolist.projects.da.ProjectsDao;
 import me.nikoltur.todolist.tasks.da.Task;
 import me.nikoltur.todolist.tasks.da.TasksDao;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,8 @@ public class TasksServiceImpl implements TasksService {
 
     @Autowired
     private TasksDao tasksDao;
+    @Autowired
+    private ProjectsDao projectsDao;
 
     @Override
     @Transactional(rollbackOn = Exception.class)
@@ -33,6 +37,10 @@ public class TasksServiceImpl implements TasksService {
 
         if (taskString == null) {
             throw new NullPointerException("Task string must not be null");
+        }
+
+        if (!projectsDao.exists(projectId)) {
+            throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
         }
 
         Task task = new Task();
