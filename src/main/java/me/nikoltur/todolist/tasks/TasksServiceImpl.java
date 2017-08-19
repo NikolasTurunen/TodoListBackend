@@ -61,4 +61,20 @@ public class TasksServiceImpl implements TasksService {
             throw new IllegalArgumentException("Project id must be greater than zero");
         }
     }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void removeTask(int taskId) {
+        if (taskId <= 0) {
+            throw new IllegalArgumentException("Task id must be greater than zero");
+        }
+
+        Task task = tasksDao.getById(taskId);
+
+        if (task == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
+        }
+
+        tasksDao.remove(task);
+    }
 }

@@ -12,8 +12,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
 
 /**
@@ -125,5 +127,56 @@ public class TasksServiceTest {
         Mockito.doReturn(false).when(projectsDao).exists(anyInt());
 
         tasksService.createTask(1243, "");
+    }
+
+    @Test
+    public void testRemoveTask() {
+        int taskId = 1;
+
+        ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).remove(argumentCaptor.capture());
+
+        Task task = new Task();
+        task.setProjectId(123);
+        task.setTaskString("Do this and that");
+
+        Mockito.doReturn(task).when(tasksDao).getById(taskId);
+
+        tasksService.removeTask(taskId);
+        Mockito.verify(tasksDao, times(1)).remove(anyObject());
+
+        Assert.assertSame("Removed task should be the same that was returned from getById", task, argumentCaptor.getValue());
+    }
+
+    @Test
+    public void testRemoveTaskThrowsForIllegalId() {
+        try {
+            tasksService.removeTask(0);
+            Assert.fail("Zero task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+
+        }
+
+        try {
+            tasksService.removeTask(-1);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+
+        }
+
+        try {
+            tasksService.removeTask(-354);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+
+        }
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testRemoveTaskThatDoesNotExistThrows() {
+        int taskId = 1;
+        Mockito.doReturn(null).when(tasksDao).getById(taskId);
+
+        tasksService.removeTask(taskId);
     }
 }

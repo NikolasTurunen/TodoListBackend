@@ -18,9 +18,24 @@ public interface TasksDao {
     public List<Task> getAllOf(int projectId);
 
     /**
+     * Returns the task with the specified taskId;
+     *
+     * @param taskId Id of the task.
+     * @return The task with the specified taskId;
+     */
+    public Task getById(int taskId);
+
+    /**
      * Saves the specified task.
      *
      * @param task Task to be saved.
      */
     public void save(Task task);
+
+    /**
+     * Removes the specified task.
+     *
+     * @param task Task to be removed.
+     */
+    public void remove(Task task);
 }

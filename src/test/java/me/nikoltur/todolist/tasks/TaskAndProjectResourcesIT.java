@@ -70,4 +70,47 @@ public class TaskAndProjectResourcesIT {
         tasksResource.createTask(project.getId(), "Mytask");
         projectsResource.removeProject(project.getName());
     }
+
+    @Test
+    public void testRemoveTask() {
+        projectsResource.createProject("Myproject");
+        Project project = projectsResource.getProjects().get(0);
+        tasksResource.createTask(project.getId(), "Mytask");
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+
+        tasksResource.removeTask(tasks.get(0).getId());
+
+        List<Task> tasksAfterRemoval = tasksResource.getTasks(project.getId());
+
+        Assert.assertTrue("Tasks should be empty after the created task was removed", tasksAfterRemoval.isEmpty());
+    }
+
+    @Test
+    public void testRemoveTaskWithMultipleTasks() {
+        String taskStringForRemoval = "Mytask";
+        String taskStringNotForRemoval = "Mytask2";
+
+        projectsResource.createProject("Myproject");
+        Project project = projectsResource.getProjects().get(0);
+        tasksResource.createTask(project.getId(), taskStringForRemoval);
+        tasksResource.createTask(project.getId(), taskStringNotForRemoval);
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+        for (Task task : tasks) {
+            if (task.getTaskString().equals(taskStringForRemoval)) {
+                tasksResource.removeTask(task.getId());
+            }
+        }
+
+        List<Task> tasksAfterRemoval = tasksResource.getTasks(project.getId());
+
+        Assert.assertEquals("One task should remain", 1, tasksAfterRemoval.size());
+        Assert.assertEquals("Task string of the remaining task should match the task that was not deleted", taskStringNotForRemoval, tasksAfterRemoval.get(0).getTaskString());
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testRemoveTaskThrowsIfTaskDoesNotExist() {
+        tasksResource.removeTask(1);
+    }
 }

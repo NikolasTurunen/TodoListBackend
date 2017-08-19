@@ -57,4 +57,13 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService, times(1)).createTask(projectId, task);
     }
+
+    @Test
+    public void testRemoveTask() {
+        int taskId = 1;
+
+        tasksResource.removeTask(taskId);
+
+        Mockito.verify(tasksService, times(1)).removeTask(taskId);
+    }
 }

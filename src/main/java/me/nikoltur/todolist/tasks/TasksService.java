@@ -29,4 +29,13 @@ public interface TasksService {
      * @throws NullPointerException Thrown if the specified task is null.
      */
     public void createTask(int projectId, String taskString);
+
+    /**
+     * Removes the specified task.
+     *
+     * @param taskId Id of the task to be removed.
+     * @throws TaskDoesNotExistException Thrown if no task with the specified taskId exists.
+     * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
+     */
+    public void removeTask(int taskId);
 }

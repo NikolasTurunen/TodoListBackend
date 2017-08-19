@@ -41,4 +41,14 @@ public class TasksResource {
     public void createTask(@RequestParam("projectId") int projectId, @RequestParam("task") String task) {
         tasksService.createTask(projectId, task);
     }
+
+    /**
+     * Removes the specified task.
+     *
+     * @param taskId Id of the task to be removed.
+     */
+    @PostMapping(BASE_PATH + "/remove")
+    public void removeTask(@RequestParam("taskId") int taskId) {
+        tasksService.removeTask(taskId);
+    }
 }
