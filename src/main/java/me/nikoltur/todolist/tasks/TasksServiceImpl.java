@@ -65,9 +65,7 @@ public class TasksServiceImpl implements TasksService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void removeTask(int taskId) {
-        if (taskId <= 0) {
-            throw new IllegalArgumentException("Task id must be greater than zero");
-        }
+        validateTaskId(taskId);
 
         Task task = tasksDao.getById(taskId);
 
@@ -81,9 +79,7 @@ public class TasksServiceImpl implements TasksService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void editTask(int taskId, String newTask) {
-        if (taskId <= 0) {
-            throw new IllegalArgumentException("Task id must be greater than zero");
-        }
+        validateTaskId(taskId);
 
         if (newTask == null) {
             throw new NullPointerException("New task must not be null");
@@ -97,5 +93,17 @@ public class TasksServiceImpl implements TasksService {
         task.setTaskString(newTask);
 
         tasksDao.save(task);
+    }
+
+    /**
+     * Validates the specified taskId.
+     *
+     * @param taskId Task id to be validated.
+     * @throws IllegalArgumentException Thrown if the specified taskId is not valid.
+     */
+    private void validateTaskId(int taskId) {
+        if (taskId <= 0) {
+            throw new IllegalArgumentException("Task id must be greater than zero");
+        }
     }
 }
