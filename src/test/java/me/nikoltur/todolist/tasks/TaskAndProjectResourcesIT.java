@@ -115,6 +115,62 @@ public class TaskAndProjectResourcesIT {
     }
 
     @Test
+    public void testProjectAndTaskCreateAndRemove() {
+        projectsResource.createProject("Project");
+        Project project = projectsResource.getProjects().get(0);
+        tasksResource.createTask(project.getId(), "Task");
+        Task task = tasksResource.getTasks(project.getId()).get(0);
+        tasksResource.removeTask(task.getId());
+        projectsResource.removeProject(project.getName());
+
+        Assert.assertTrue("Projects should be empty after removal of task and project", projectsResource.getProjects().isEmpty());
+    }
+
+    @Test
+    public void testTasksAreCorrectlyUnderProjects() {
+        final String project1Name = "Project";
+        final String project2Name = "Project2";
+
+        projectsResource.createProject(project1Name);
+        projectsResource.createProject(project2Name);
+
+        List<Project> projects = projectsResource.getProjects();
+
+        Project project1 = null;
+        Project project2 = null;
+
+        for (Project project : projects) {
+            switch (project.getName()) {
+                case project1Name:
+                    project1 = project;
+                    break;
+                case project2Name:
+                    project2 = project;
+                    break;
+            }
+        }
+
+        if (project1 == null || project2 == null) {
+            Assert.fail("Null project");
+            return;
+        }
+
+        String task1Name = "Task1";
+        String task2Name = "Task2";
+
+        tasksResource.createTask(project1.getId(), task1Name);
+        tasksResource.createTask(project2.getId(), task2Name);
+
+        List<Task> tasks1 = tasksResource.getTasks(project1.getId());
+        Assert.assertEquals("First project should have 1 task", 1, tasks1.size());
+        Assert.assertEquals("The single task of first project should have the specified task string", task1Name, tasks1.get(0).getTaskString());
+
+        List<Task> tasks2 = tasksResource.getTasks(project2.getId());
+        Assert.assertEquals("Second project should have 1 task", 1, tasks2.size());
+        Assert.assertEquals("The single task of second project should have the specified task string", task2Name, tasks2.get(0).getTaskString());
+    }
+
+    @Test
     public void testEditTask() {
         String newTask = "Do this instead";
 
