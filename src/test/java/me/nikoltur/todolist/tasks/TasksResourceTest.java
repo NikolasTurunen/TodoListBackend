@@ -66,4 +66,14 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService, times(1)).removeTask(taskId);
     }
+
+    @Test
+    public void testEditTask() {
+        int taskId = 1;
+        String newTask = "Do this instead!";
+
+        tasksResource.editTask(taskId, newTask);
+
+        Mockito.verify(tasksService, times(1)).editTask(taskId, newTask);
+    }
 }

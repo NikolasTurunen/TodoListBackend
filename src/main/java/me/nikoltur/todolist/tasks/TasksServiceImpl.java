@@ -77,4 +77,25 @@ public class TasksServiceImpl implements TasksService {
 
         tasksDao.remove(task);
     }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void editTask(int taskId, String newTask) {
+        if (taskId <= 0) {
+            throw new IllegalArgumentException("Task id must be greater than zero");
+        }
+
+        if (newTask == null) {
+            throw new NullPointerException("New task must not be null");
+        }
+
+        Task task = tasksDao.getById(taskId);
+        if (task == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
+        }
+
+        task.setTaskString(newTask);
+
+        tasksDao.save(task);
+    }
 }

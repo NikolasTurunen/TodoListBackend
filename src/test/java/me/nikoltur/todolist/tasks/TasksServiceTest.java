@@ -179,4 +179,68 @@ public class TasksServiceTest {
 
         tasksService.removeTask(taskId);
     }
+
+    @Test
+    public void testEditTask() {
+        int taskId = 1;
+        String newTask = "Do this now!";
+
+        Task task = new Task();
+        task.setProjectId(1);
+        task.setTaskString("Test task");
+
+        Mockito.doReturn(task).when(tasksDao).getById(taskId);
+
+        ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
+
+        tasksService.editTask(taskId, newTask);
+
+        Mockito.verify(tasksDao, times(1)).save(anyObject());
+        Assert.assertSame("Saved task should be the same as the task to be edited", task, argumentCaptor.getValue());
+        Assert.assertEquals("Saved task should have the specified newTask", newTask, argumentCaptor.getValue().getTaskString());
+    }
+
+    @Test
+    public void testEditTaskThrowsForIllegalId() {
+        String newTask = "Do this now!";
+
+        try {
+            tasksService.editTask(0, newTask);
+            Assert.fail("Zero task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.editTask(-1, newTask);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.editTask(-354, newTask);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testEditTaskThrowsForNullNewTask() {
+        int taskId = 1;
+
+        Task task = new Task();
+        task.setTaskString("Do that");
+        Mockito.doReturn(task).when(tasksDao).getById(taskId);
+
+        tasksService.editTask(taskId, null);
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testEditTaskThrowsForNonExistingTask() {
+        int taskId = 1;
+
+        Mockito.doReturn(null).when(tasksDao).getById(taskId);
+
+        tasksService.editTask(taskId, "Task to do");
+    }
 }

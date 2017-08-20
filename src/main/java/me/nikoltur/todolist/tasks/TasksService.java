@@ -38,4 +38,15 @@ public interface TasksService {
      * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
      */
     public void removeTask(int taskId);
+
+    /**
+     * Edits the specified task to the specified newTask.
+     *
+     * @param taskId Id of the task to be edited.
+     * @param newTask New task string to be the new task.
+     * @throws TaskDoesNotExistException Thrown if no task with the specified taskId exists.
+     * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
+     * @throws NullPointerException Thrown if the specified task is null.
+     */
+    public void editTask(int taskId, String newTask);
 }

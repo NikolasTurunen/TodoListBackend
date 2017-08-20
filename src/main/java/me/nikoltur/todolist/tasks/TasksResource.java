@@ -51,4 +51,15 @@ public class TasksResource {
     public void removeTask(@RequestParam("taskId") int taskId) {
         tasksService.removeTask(taskId);
     }
+
+    /**
+     * Edits the specified task to the specified newTask.
+     *
+     * @param taskId Id of the task to be edited.
+     * @param newTask New task string to be the new task.
+     */
+    @PostMapping(BASE_PATH + "/edit")
+    public void editTask(@RequestParam("taskId") int taskId, @RequestParam("newTask") String newTask) {
+        tasksService.editTask(taskId, newTask);
+    }
 }

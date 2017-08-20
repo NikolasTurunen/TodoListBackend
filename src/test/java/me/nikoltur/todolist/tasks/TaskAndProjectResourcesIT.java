@@ -113,4 +113,23 @@ public class TaskAndProjectResourcesIT {
     public void testRemoveTaskThrowsIfTaskDoesNotExist() {
         tasksResource.removeTask(1);
     }
+
+    @Test
+    public void testEditTask() {
+        String newTask = "Do this instead";
+
+        projectsResource.createProject("Project");
+        Project project = projectsResource.getProjects().get(0);
+        tasksResource.createTask(project.getId(), "Task");
+        Task task = tasksResource.getTasks(project.getId()).get(0);
+        tasksResource.editTask(task.getId(), newTask);
+
+        Task editedTask = tasksResource.getTasks(project.getId()).get(0);
+        Assert.assertEquals("Edited task should have the new task string", newTask, editedTask.getTaskString());
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testEditTaskThrowsIfTaskDoesNotExist() {
+        tasksResource.editTask(1, "Does not matter");
+    }
 }
