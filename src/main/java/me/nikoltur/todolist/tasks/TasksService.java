@@ -49,4 +49,16 @@ public interface TasksService {
      * @throws NullPointerException Thrown if the specified task is null.
      */
     public void editTask(int taskId, String newTask);
+
+    /**
+     * Creates a detail for the specified task.
+     * The created detail is a task with a parent so it can be controlled with the {@link #editTask(int, String) editTask} and {@link #removeTask(int) removeTask} methods.
+     *
+     * @param taskId Id of the task.
+     * @param detail Detail for the task.
+     * @throws TaskDoesNotExistException Thrown if no task with the specified taskId exists.
+     * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
+     * @throws NullPointerException Thrown if the specified detail is null.
+     */
+    public void createDetail(int taskId, String detail);
 }

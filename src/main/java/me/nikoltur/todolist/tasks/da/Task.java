@@ -1,11 +1,14 @@
 package me.nikoltur.todolist.tasks.da;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -22,19 +25,24 @@ public class Task implements Serializable {
     @Column(name = "id")
     private int id;
     @Column(name = "project_id")
-    private int projectId;
+    private Integer projectId;
     @Column(name = "task")
     private String taskString;
+    @Column(name = "parent_task_id")
+    private Integer parentTaskId;
+    @OneToMany
+    @JoinColumn(name = "parent_task_id", referencedColumnName = "id")
+    private List<Task> details;
 
     public int getId() {
         return id;
     }
 
-    public int getProjectId() {
+    public Integer getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(int projectId) {
+    public void setProjectId(Integer projectId) {
         this.projectId = projectId;
     }
 
@@ -44,5 +52,17 @@ public class Task implements Serializable {
 
     public void setTaskString(String taskString) {
         this.taskString = taskString;
+    }
+
+    public Integer getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(Integer parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
+
+    public List<Task> getDetails() {
+        return details;
     }
 }

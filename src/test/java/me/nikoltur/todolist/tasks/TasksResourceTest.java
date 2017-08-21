@@ -76,4 +76,14 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService, times(1)).editTask(taskId, newTask);
     }
+
+    @Test
+    public void testCreateDetail() {
+        int taskId = 1;
+        String taskDetail = "Detail";
+
+        tasksResource.createDetail(taskId, taskDetail);
+
+        Mockito.verify(tasksService, times(1)).createDetail(taskId, taskDetail);
+    }
 }

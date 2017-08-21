@@ -77,7 +77,7 @@ public class TasksServiceTest {
 
     @Test
     public void testCreateTask() {
-        int projectId = 1;
+        Integer projectId = 1;
         String taskString = "Hello world";
 
         ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
@@ -242,5 +242,62 @@ public class TasksServiceTest {
         Mockito.doReturn(null).when(tasksDao).getById(taskId);
 
         tasksService.editTask(taskId, "Task to do");
+    }
+
+    @Test
+    public void testCreateDetail() {
+        Integer parentTaskId = 1;
+        String detailString = "Detail";
+
+        ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
+
+        Task task = new Task();
+        task.setTaskString("Do that");
+        Mockito.doReturn(task).when(tasksDao).getById(parentTaskId);
+
+        tasksService.createDetail(parentTaskId, detailString);
+
+        Mockito.verify(tasksDao, times(1)).save(anyObject());
+        Assert.assertEquals("Parent task id of the saved task should be the specified task id", parentTaskId, argumentCaptor.getValue().getParentTaskId());
+        Assert.assertNull("Project id of the saved task should be null", argumentCaptor.getValue().getProjectId());
+        Assert.assertEquals("Detail of the saved task should be the specified detail", detailString, argumentCaptor.getValue().getTaskString());
+    }
+
+    @Test
+    public void testCreateDetailThrowsForIllegalTaskId() {
+        String newTask = "Do this now!";
+
+        try {
+            tasksService.createDetail(0, newTask);
+            Assert.fail("Zero task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.createDetail(-1, newTask);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.createDetail(-354, newTask);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testCreateDetailThrowsForNullDetail() {
+        tasksService.createDetail(1, null);
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testCreateDetailThrowsForNonExistingParentTask() {
+        int parentTaskId = 1;
+
+        Mockito.doReturn(null).when(tasksDao).getById(parentTaskId);
+
+        tasksService.createDetail(parentTaskId, "Detail");
     }
 }

@@ -62,4 +62,15 @@ public class TasksResource {
     public void editTask(@RequestParam("taskId") int taskId, @RequestParam("newTask") String newTask) {
         tasksService.editTask(taskId, newTask);
     }
+
+    /**
+     * Creates a detail for the specified task.
+     *
+     * @param taskId Id of the task.
+     * @param detail Detail for the task.
+     */
+    @PostMapping(BASE_PATH + "/createdetail")
+    public void createDetail(@RequestParam("taskId") int taskId, @RequestParam("detail") String detail) {
+        tasksService.createDetail(taskId, detail);
+    }
 }

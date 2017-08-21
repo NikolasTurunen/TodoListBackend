@@ -40,10 +40,9 @@ public class TaskAndProjectResourcesIT {
 
     @Test
     public void testCreateTaskForProject() {
-        projectsResource.createProject("Project");
+        Project project = createProject("Project");
 
         String taskString = "Do this and do that";
-        Project project = projectsResource.getProjects().get(0);
 
         Assert.assertEquals("Size of tasks should be initially zero", 0, tasksResource.getTasks(project.getId()).size());
 
@@ -54,7 +53,7 @@ public class TaskAndProjectResourcesIT {
 
         Task task = tasks.get(0);
         Assert.assertEquals("Id of the single task should be 1", 1, task.getId());
-        Assert.assertEquals("Project id of the single task should match the created task", project.getId(), task.getProjectId());
+        Assert.assertEquals("Project id of the single task should match the created task", project.getId(), (int) task.getProjectId());
         Assert.assertEquals("Task string of the single task should match the created task", taskString, task.getTaskString());
     }
 
@@ -65,21 +64,18 @@ public class TaskAndProjectResourcesIT {
 
     @Test(expected = ProjectHasTasksException.class)
     public void testProjectRemovalWithTasks() {
-        projectsResource.createProject("Myproject");
-        Project project = projectsResource.getProjects().get(0);
+        Project project = createProject("Project");
         tasksResource.createTask(project.getId(), "Mytask");
         projectsResource.removeProject(project.getName());
     }
 
     @Test
     public void testRemoveTask() {
-        projectsResource.createProject("Myproject");
-        Project project = projectsResource.getProjects().get(0);
-        tasksResource.createTask(project.getId(), "Mytask");
+        Project project = createProject("Project");
 
-        List<Task> tasks = tasksResource.getTasks(project.getId());
+        Task task = createTask(project.getId(), "Mytask");
 
-        tasksResource.removeTask(tasks.get(0).getId());
+        tasksResource.removeTask(task.getId());
 
         List<Task> tasksAfterRemoval = tasksResource.getTasks(project.getId());
 
@@ -91,17 +87,11 @@ public class TaskAndProjectResourcesIT {
         String taskStringForRemoval = "Mytask";
         String taskStringNotForRemoval = "Mytask2";
 
-        projectsResource.createProject("Myproject");
-        Project project = projectsResource.getProjects().get(0);
-        tasksResource.createTask(project.getId(), taskStringForRemoval);
-        tasksResource.createTask(project.getId(), taskStringNotForRemoval);
+        Project project = createProject("Project");
+        Task taskForRemoval = createTask(project.getId(), taskStringForRemoval);
+        createTask(project.getId(), taskStringNotForRemoval);
 
-        List<Task> tasks = tasksResource.getTasks(project.getId());
-        for (Task task : tasks) {
-            if (task.getTaskString().equals(taskStringForRemoval)) {
-                tasksResource.removeTask(task.getId());
-            }
-        }
+        tasksResource.removeTask(taskForRemoval.getId());
 
         List<Task> tasksAfterRemoval = tasksResource.getTasks(project.getId());
 
@@ -116,10 +106,8 @@ public class TaskAndProjectResourcesIT {
 
     @Test
     public void testProjectAndTaskCreateAndRemove() {
-        projectsResource.createProject("Project");
-        Project project = projectsResource.getProjects().get(0);
-        tasksResource.createTask(project.getId(), "Task");
-        Task task = tasksResource.getTasks(project.getId()).get(0);
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
         tasksResource.removeTask(task.getId());
         projectsResource.removeProject(project.getName());
 
@@ -174,10 +162,8 @@ public class TaskAndProjectResourcesIT {
     public void testEditTask() {
         String newTask = "Do this instead";
 
-        projectsResource.createProject("Project");
-        Project project = projectsResource.getProjects().get(0);
-        tasksResource.createTask(project.getId(), "Task");
-        Task task = tasksResource.getTasks(project.getId()).get(0);
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
         tasksResource.editTask(task.getId(), newTask);
 
         Task editedTask = tasksResource.getTasks(project.getId()).get(0);
@@ -187,5 +173,144 @@ public class TaskAndProjectResourcesIT {
     @Test(expected = TaskDoesNotExistException.class)
     public void testEditTaskThrowsIfTaskDoesNotExist() {
         tasksResource.editTask(1, "Does not matter");
+    }
+
+    @Test
+    public void testDetailsIsInitiallyEmpty() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+
+        Assert.assertTrue("Details of task should initially be empty", task.getDetails().isEmpty());
+    }
+
+    @Test
+    public void testCreateDetailAndGetTasksDoesNotReturnDetailDirectly() {
+        String taskString = "Task";
+
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), taskString);
+        tasksResource.createDetail(task.getId(), "Task detail");
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+        Assert.assertEquals("Size of tasks should be 1 because it should not contain the created detail", 1, tasks.size());
+        Assert.assertEquals("The single task should be the created task", taskString, tasks.get(0).getTaskString());
+    }
+
+    @Test
+    public void testCreatedDetailIsInDetails() {
+        String detailString = "Task detail";
+
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        tasksResource.createDetail(task.getId(), detailString);
+        List<Task> details = task.getDetails();
+        Assert.assertEquals("Size of details should be 1 after creation of a single detail for the task", 1, details.size());
+        Assert.assertEquals("The task string of the single detail should equal the created detail", detailString, details.get(0).getTaskString());
+    }
+
+    @Test
+    public void testCreateMultipleDetails() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        createDetail(task, "Detail1");
+        createDetail(task, "Detail2");
+        createDetail(task, "Detail3");
+        createDetail(task, "Detail4");
+
+        Assert.assertEquals("Should contain 4 details", 4, tasksResource.getTasks(project.getId()).get(0).getDetails().size());
+    }
+
+    @Test
+    public void testDetailCanBeRemoved() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        Task detail = createDetail(task, "Detail");
+        tasksResource.removeTask(detail.getId());
+
+        Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
+        Assert.assertTrue("Details of task should be empty after the single detail is removed", updatedTask.getDetails().isEmpty());
+    }
+
+    @Test
+    public void testDetailCanBeEdited() {
+        String newDetailString = "NewDetail";
+
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        Task detail = createDetail(task, "Detail");
+        tasksResource.editTask(detail.getId(), newDetailString);
+
+        Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
+        Assert.assertEquals("Detail should have the new task string after edit", newDetailString, updatedTask.getDetails().get(0).getTaskString());
+    }
+
+    @Test
+    public void testTaskCanBeRemovedWithDetails() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        createDetail(task, "Detail");
+        createDetail(task, "Detail2");
+        createDetail(task, "Detail3");
+        tasksResource.removeTask(task.getId());
+
+        Assert.assertTrue("Task should be removed even if if it has details", tasksResource.getTasks(project.getId()).isEmpty());
+    }
+
+    /**
+     * Creates a project with the specified name and returns the created project.
+     *
+     * @param name Name of the project to be created.
+     * @return The created project.
+     */
+    private Project createProject(String name) {
+        projectsResource.createProject(name);
+        for (Project project : projectsResource.getProjects()) {
+            if (project.getName().equals(name)) {
+                return project;
+            }
+        }
+        throw new IllegalStateException("The created project was not found");
+    }
+
+    /**
+     * Creates a task for the specified project with the specified taskString and returns the created task.
+     *
+     * @param projectId Id of the project to create the task for.
+     * @param taskString Task string for the task.
+     * @return The created task.
+     */
+    private Task createTask(int projectId, String taskString) {
+        tasksResource.createTask(projectId, taskString);
+        for (Task task : tasksResource.getTasks(projectId)) {
+            if (task.getTaskString().equals(taskString)) {
+                return task;
+            }
+        }
+
+        throw new IllegalStateException("The created task was not found");
+    }
+
+    /**
+     * Creates a detail for the specified task with the specified detailString and returns the created detail.
+     *
+     * @param task Task for the detail to be created for.
+     * @param detailString Task string for the detail
+     * @return The created detail.
+     */
+    private Task createDetail(Task task, String detailString) {
+        tasksResource.createDetail(task.getId(), detailString);
+
+        List<Task> tasks = tasksResource.getTasks(task.getProjectId());
+
+        for (Task updatedTask : tasks) {
+            if (updatedTask.getId() == task.getId()) {
+                for (Task detail : updatedTask.getDetails()) {
+                    if (detail.getTaskString().equals(detailString)) {
+                        return detail;
+                    }
+                }
+            }
+        }
+
+        throw new IllegalStateException("The created detail was not found");
     }
 }

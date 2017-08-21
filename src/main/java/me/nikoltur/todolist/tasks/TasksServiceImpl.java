@@ -34,10 +34,7 @@ public class TasksServiceImpl implements TasksService {
     @Transactional(rollbackOn = Exception.class)
     public void createTask(int projectId, String taskString) {
         validateProjectId(projectId);
-
-        if (taskString == null) {
-            throw new NullPointerException("Task string must not be null");
-        }
+        validateTaskString(taskString);
 
         if (!projectsDao.exists(projectId)) {
             throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
@@ -80,10 +77,7 @@ public class TasksServiceImpl implements TasksService {
     @Transactional(rollbackOn = Exception.class)
     public void editTask(int taskId, String newTask) {
         validateTaskId(taskId);
-
-        if (newTask == null) {
-            throw new NullPointerException("New task must not be null");
-        }
+        validateTaskString(newTask);
 
         Task task = tasksDao.getById(taskId);
         if (task == null) {
@@ -91,6 +85,24 @@ public class TasksServiceImpl implements TasksService {
         }
 
         task.setTaskString(newTask);
+
+        tasksDao.save(task);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void createDetail(int taskId, String detail) {
+        validateTaskId(taskId);
+        validateTaskString(detail);
+
+        Task parentTask = tasksDao.getById(taskId);
+        if (parentTask == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
+        }
+
+        Task task = new Task();
+        task.setParentTaskId(taskId);
+        task.setTaskString(detail);
 
         tasksDao.save(task);
     }
@@ -104,6 +116,18 @@ public class TasksServiceImpl implements TasksService {
     private void validateTaskId(int taskId) {
         if (taskId <= 0) {
             throw new IllegalArgumentException("Task id must be greater than zero");
+        }
+    }
+
+    /**
+     * Validates the specified taskString.
+     *
+     * @param taskString Task string to be validated.
+     * @throws NullPointerException Thrown if the specified taskString is null.
+     */
+    private void validateTaskString(String taskString) {
+        if (taskString == null) {
+            throw new NullPointerException("Task string cannot be null");
         }
     }
 }
