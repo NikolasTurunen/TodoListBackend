@@ -211,10 +211,10 @@ public class TaskAndProjectResourcesIT {
     public void testCreateMultipleDetails() {
         Project project = createProject("Project");
         Task task = createTask(project.getId(), "Task");
-        createDetail(task, "Detail1");
-        createDetail(task, "Detail2");
-        createDetail(task, "Detail3");
-        createDetail(task, "Detail4");
+        createDetailForTask(task, "Detail1");
+        createDetailForTask(task, "Detail2");
+        createDetailForTask(task, "Detail3");
+        createDetailForTask(task, "Detail4");
 
         Assert.assertEquals("Should contain 4 details", 4, tasksResource.getTasks(project.getId()).get(0).getDetails().size());
     }
@@ -223,7 +223,7 @@ public class TaskAndProjectResourcesIT {
     public void testDetailCanBeRemoved() {
         Project project = createProject("Project");
         Task task = createTask(project.getId(), "Task");
-        Task detail = createDetail(task, "Detail");
+        Task detail = createDetailForTask(task, "Detail");
         tasksResource.removeTask(detail.getId());
 
         Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
@@ -236,7 +236,7 @@ public class TaskAndProjectResourcesIT {
 
         Project project = createProject("Project");
         Task task = createTask(project.getId(), "Task");
-        Task detail = createDetail(task, "Detail");
+        Task detail = createDetailForTask(task, "Detail");
         tasksResource.editTask(detail.getId(), newDetailString);
 
         Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
@@ -247,12 +247,27 @@ public class TaskAndProjectResourcesIT {
     public void testTaskCanBeRemovedWithDetails() {
         Project project = createProject("Project");
         Task task = createTask(project.getId(), "Task");
-        createDetail(task, "Detail");
-        createDetail(task, "Detail2");
-        createDetail(task, "Detail3");
+        createDetailForTask(task, "Detail");
+        createDetailForTask(task, "Detail2");
+        createDetailForTask(task, "Detail3");
         tasksResource.removeTask(task.getId());
 
         Assert.assertTrue("Task should be removed even if if it has details", tasksResource.getTasks(project.getId()).isEmpty());
+    }
+
+    @Test
+    public void testCreateDetailForDetail() {
+        String detailOfDetailString = "Detail of detail";
+
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        Task detail = createDetailForTask(task, "Detail");
+        createDetailForDetail(detail, detailOfDetailString);
+
+        Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
+        Task updatedDetail = updatedTask.getDetails().get(0);
+        Assert.assertEquals("Size of details of detail should be 1", 1, updatedDetail.getDetails().size());
+        Assert.assertEquals("Task string of detail of detail should match the created detail", detailOfDetailString, updatedDetail.getDetails().get(0).getTaskString());
     }
 
     /**
@@ -296,7 +311,7 @@ public class TaskAndProjectResourcesIT {
      * @param detailString Task string for the detail
      * @return The created detail.
      */
-    private Task createDetail(Task task, String detailString) {
+    private Task createDetailForTask(Task task, String detailString) {
         tasksResource.createDetail(task.getId(), detailString);
 
         List<Task> tasks = tasksResource.getTasks(task.getProjectId());
@@ -312,5 +327,15 @@ public class TaskAndProjectResourcesIT {
         }
 
         throw new IllegalStateException("The created detail was not found");
+    }
+
+    /**
+     * Creates a detail for a detail.
+     *
+     * @param detail Detail for the detail to be created for.
+     * @param detailString Detail string of the detail to be created.
+     */
+    private void createDetailForDetail(Task detail, String detailString) {
+        tasksResource.createDetail(detail.getId(), detailString);
     }
 }
