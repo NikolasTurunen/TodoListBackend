@@ -26,7 +26,7 @@ public class Task implements Serializable {
     private int id;
     @Column(name = "project_id")
     private Integer projectId;
-    @Column(name = "task")
+    @Column(name = "task", nullable = false)
     private String taskString;
     @Column(name = "parent_task_id")
     private Integer parentTaskId;
