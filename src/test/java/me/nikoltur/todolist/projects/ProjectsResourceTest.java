@@ -65,4 +65,13 @@ public class ProjectsResourceTest {
 
         Mockito.verify(projectsService, times(1)).removeProject(projectName);
     }
+
+    @Test
+    public void testRenameProject() {
+        String projectName = "Project1";
+        String newProjectName = "NewProject1";
+        projectsResource.renameProject(projectName, newProjectName);
+
+        Mockito.verify(projectsService, times(1)).renameProject(projectName, newProjectName);
+    }
 }

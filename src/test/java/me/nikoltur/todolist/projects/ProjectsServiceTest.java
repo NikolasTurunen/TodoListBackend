@@ -15,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
@@ -83,6 +84,11 @@ public class ProjectsServiceTest {
         projectsService.createProject("");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testCreateProjectThrowsForWhitespaceOnlyName() {
+        projectsService.createProject(" ");
+    }
+
     @Test
     public void testCreateProjectThrowsIfProjectAlreadyExists() {
         String projectName = "Testtt";
@@ -143,6 +149,11 @@ public class ProjectsServiceTest {
         projectsService.removeProject("");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testRemoveProjectThrowsForWhitespaceOnlyName() {
+        projectsService.removeProject(" ");
+    }
+
     @Test(expected = ProjectHasTasksException.class)
     public void testRemoveProjectThrowsIfProjectHasTasks() {
         String projectName = "Project name";
@@ -160,5 +171,121 @@ public class ProjectsServiceTest {
 
         Mockito.doReturn(tasks).when(tasksDao).getAllOf(anyInt());
         projectsService.removeProject(projectName);
+    }
+
+    @Test
+    public void testRenameProject() {
+        String projectName = "Project";
+        String newProjectName = "New Project name";
+
+        Project project = new Project();
+        project.setName(projectName);
+
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
+
+        projectsService.renameProject(projectName, newProjectName);
+
+        Mockito.verify(projectsDao, times(1)).save(anyObject());
+        Assert.assertSame("Saved project should be the same as returned from getByName()", project, argumentCaptor.getValue());
+        Assert.assertEquals("Saved project should have the new name", newProjectName, argumentCaptor.getValue().getName());
+    }
+
+    @Test
+    public void testRenameProjectThrowsForNullName() {
+
+        Project project = new Project();
+        project.setName("Project");
+
+        Mockito.doReturn(project).when(projectsDao).getByName(anyString());
+
+        try {
+            projectsService.renameProject(null, "New name");
+            Assert.fail("Should throw NullPointerException for null name");
+        } catch (NullPointerException ex) {
+        }
+
+        try {
+            projectsService.renameProject("Name", null);
+            Assert.fail("Should throw NullPointerException for null newName");
+        } catch (NullPointerException ex) {
+        }
+
+        try {
+            projectsService.renameProject(null, null);
+            Assert.fail("Should throw NullPointerException for both null name and null newName");
+        } catch (NullPointerException ex) {
+        }
+    }
+
+    @Test
+    public void testRenameProjectThrowsForEmptyName() {
+        Project project = new Project();
+        project.setName("Project");
+
+        Mockito.doReturn(project).when(projectsDao).getByName(anyString());
+
+        try {
+            projectsService.renameProject("", "New name");
+            Assert.fail("Should throw IllegalArgumentException for empty name");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.renameProject("Name", "");
+            Assert.fail("Should throw IllegalArgumentException for empty newName");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.renameProject("", "");
+            Assert.fail("Should throw IllegalArgumentException for both empty name and empty newName");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.renameProject(" ", "New name");
+            Assert.fail("Should throw IllegalArgumentException for space-only name");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.renameProject("Name", " ");
+            Assert.fail("Should throw IllegalArgumentException for space-only newName");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.renameProject(" ", " ");
+            Assert.fail("Should throw IllegalArgumentException for space-only both name and newName");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test(expected = ProjectDoesNotExistException.class)
+    public void testRenameProjectThrowsWhenProjectDoesNotExist() {
+        String projectName = "Project";
+
+        Mockito.doReturn(null).when(projectsDao).getByName(projectName);
+
+        projectsService.renameProject(projectName, "New name");
+    }
+
+    @Test(expected = ProjectAlreadyExistsException.class)
+    public void testRenameProjectThrowsWhenProjectAlreadyExists() {
+        String projectName = "Project";
+        String newProjectName = "New Project";
+
+        Project project = new Project();
+        project.setName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+
+        Project alreadyExistingProject = new Project();
+        alreadyExistingProject.setName(newProjectName);
+        Mockito.doReturn(alreadyExistingProject).when(projectsDao).getByName(newProjectName);
+
+        projectsService.renameProject(projectName, newProjectName);
     }
 }

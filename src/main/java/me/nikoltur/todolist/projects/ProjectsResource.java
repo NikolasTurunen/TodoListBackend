@@ -58,6 +58,6 @@ public class ProjectsResource {
      */
     @PostMapping(BASE_PATH + "/rename")
     public void renameProject(@RequestParam("name") String name, @RequestParam("newName") String newName) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        projectsService.renameProject(name, newName);
     }
 }

@@ -85,4 +85,34 @@ public class ProjectsResourceIT {
             Assert.assertSame("Should throw ProjectDoesNotExistException if a project with the specified name does not exist", ProjectDoesNotExistException.class, ex.getClass());
         }
     }
+
+    @Test
+    public void testRenameProject() {
+        String name = "Project";
+        String newName = "New Project Name";
+
+        projectsResource.createProject(name);
+
+        projectsResource.renameProject(name, newName);
+
+        List<Project> projects = projectsResource.getProjects();
+        Assert.assertEquals("Size of projects should be 1", 1, projects.size());
+        Assert.assertEquals("Name of project should be the new name", newName, projects.get(0).getName());
+    }
+
+    @Test(expected = ProjectDoesNotExistException.class)
+    public void testRenameProjectThrowsForNonExistingProject() {
+        projectsResource.renameProject("Name", "New name");
+    }
+
+    @Test(expected = ProjectAlreadyExistsException.class)
+    public void testRenameProjectThrowsForAlreadyExistingProject() {
+        String projectName = "Project";
+        String newProjectName = "New project";
+
+        projectsResource.createProject(projectName);
+        projectsResource.createProject(newProjectName);
+
+        projectsResource.renameProject(projectName, newProjectName);
+    }
 }

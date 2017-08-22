@@ -37,4 +37,16 @@ public interface ProjectsService {
      * @throws IllegalArgumentException Thrown if the specified name is empty.
      */
     public void removeProject(String name);
+
+    /**
+     * Renames the specified project with the specified name to the specified newName.
+     *
+     * @param name Name of the project to be renamed.
+     * @param newName New name for the project.
+     * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
+     * @throws ProjectAlreadyExistsException Thrown if a project with the specified newName already exists.
+     * @throws NullPointerException Thrown if the specified name or newName is null.
+     * @throws IllegalArgumentException Thrown if the specified name or newName is empty.
+     */
+    public void renameProject(String name, String newName);
 }

@@ -30,18 +30,9 @@ public class ProjectsServiceImpl implements ProjectsService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void createProject(String name) {
-        if (name == null) {
-            throw new NullPointerException("The specified name must not be null");
-        }
+        validateName(name);
 
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The specified name must not be empty");
-        }
-
-        Project existingProject = projectsDao.getByName(name);
-        if (existingProject != null) {
-            throw new ProjectAlreadyExistsException("Project with the name " + name + " already exists");
-        }
+        verifyProjectDoesNotExist(name);
 
         Project project = new Project();
         project.setName(name);
@@ -51,13 +42,7 @@ public class ProjectsServiceImpl implements ProjectsService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void removeProject(String name) {
-        if (name == null) {
-            throw new NullPointerException("The specified name must not be null");
-        }
-
-        if (name.isEmpty()) {
-            throw new IllegalArgumentException("The specified name must not be empty");
-        }
+        validateName(name);
 
         Project project = projectsDao.getByName(name);
         if (project == null) {
@@ -69,5 +54,53 @@ public class ProjectsServiceImpl implements ProjectsService {
         }
 
         projectsDao.remove(project);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void renameProject(String name, String newName) {
+        validateName(name);
+        validateName(newName);
+
+        verifyProjectDoesNotExist(newName);
+
+        Project project = projectsDao.getByName(name);
+        if (project == null) {
+            throw new ProjectDoesNotExistException("No project with the specified name exists");
+        }
+
+        project.setName(newName);
+
+        projectsDao.save(project);
+    }
+
+    /**
+     * Validates the specified project name.
+     *
+     * @param name Name to be validated.
+     * @throws NullPointerException Thrown if the specified name is null.
+     * @throws IllegalArgumentException Thrown if the specified name is empty or whitespace-only.
+     */
+    private void validateName(String name) {
+        if (name == null) {
+            throw new NullPointerException("Project name must not be null");
+        }
+
+        if (name.trim().isEmpty()) {
+            throw new IllegalArgumentException("Project name must not be empty or whitespace-only");
+        }
+    }
+
+    /**
+     * Verifies that no project with the specified name exists.
+     *
+     * @param name Name of the project to check.
+     * @throws ProjectAlreadyExistsException Thrown if a project with the specified name exists.
+     */
+    private void verifyProjectDoesNotExist(String name) {
+        Project existingProject = projectsDao.getByName(name);
+        if (existingProject != null) {
+            throw new ProjectAlreadyExistsException("Project with the name " + name + " already exists");
+        }
     }
 }
