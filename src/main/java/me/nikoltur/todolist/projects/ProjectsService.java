@@ -23,7 +23,7 @@ public interface ProjectsService {
      * @param name Name of the project to be created.
      * @throws ProjectAlreadyExistsException Thrown if a project with the specified name already exists.
      * @throws NullPointerException Thrown if the specified name is null.
-     * @throws IllegalArgumentException Thrown if the specified name is empty.
+     * @throws IllegalArgumentException Thrown if the specified name is invalid.
      */
     public void createProject(String name);
 
@@ -34,7 +34,7 @@ public interface ProjectsService {
      * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
      * @throws ProjectHasTasksException Thrown if the project with the specified name still has tasks referencing to it.
      * @throws NullPointerException Thrown if the specified name is null.
-     * @throws IllegalArgumentException Thrown if the specified name is empty.
+     * @throws IllegalArgumentException Thrown if the specified name is invalid.
      */
     public void removeProject(String name);
 
@@ -46,7 +46,7 @@ public interface ProjectsService {
      * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
      * @throws ProjectAlreadyExistsException Thrown if a project with the specified newName already exists.
      * @throws NullPointerException Thrown if the specified name or newName is null.
-     * @throws IllegalArgumentException Thrown if the specified name or newName is empty.
+     * @throws IllegalArgumentException Thrown if the specified name or newName is invalid.
      */
     public void renameProject(String name, String newName);
 
@@ -57,7 +57,7 @@ public interface ProjectsService {
      * @param name2 Name of the second project.
      * @throws ProjectDoesNotExistException Thrown if no project with the specified name or name2 exists.
      * @throws NullPointerException Thrown if the specified name or name2 is null.
-     * @throws IllegalArgumentException Thrown if the specified name or name2 is empty or whitespace-only. Or if the specified name equals the specified name2.
+     * @throws IllegalArgumentException Thrown if the specified name or name2 is invalid. Or if the specified name equals the specified name2.
      */
     public void swapPositionsOfProjects(String name, String name2);
 }
