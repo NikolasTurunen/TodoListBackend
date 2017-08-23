@@ -21,9 +21,9 @@ public class ProjectsResource {
     private ProjectsService projectsService;
 
     /**
-     * Returns a list of all projects.
+     * Returns a list of all projects ordered by their position.
      *
-     * @return A list of all projects.
+     * @return A list of all projects ordered by their position.
      */
     @GetMapping(BASE_PATH)
     public List<Project> getProjects() {
@@ -59,5 +59,16 @@ public class ProjectsResource {
     @PostMapping(BASE_PATH + "/rename")
     public void renameProject(@RequestParam("name") String name, @RequestParam("newName") String newName) {
         projectsService.renameProject(name, newName);
+    }
+
+    /**
+     * Swaps the positions of the specified projects.
+     *
+     * @param name Name of the first project.
+     * @param name2 Name of the second project.
+     */
+    @PostMapping(BASE_PATH + "/swappositions")
+    public void swapPositionsOfProjects(@RequestParam("name") String name, @RequestParam("name2") String name2) {
+        projectsService.swapPositionsOfProjects(name, name2);
     }
 }

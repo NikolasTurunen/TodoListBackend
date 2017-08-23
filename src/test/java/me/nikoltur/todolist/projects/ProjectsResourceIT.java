@@ -115,4 +115,63 @@ public class ProjectsResourceIT {
 
         projectsResource.renameProject(projectName, newProjectName);
     }
+
+    @Test
+    public void testCreateProjectSavesPosition() {
+        String firstProjectName = "Name1";
+        String secondProjectName = "Name2";
+        projectsResource.createProject(firstProjectName);
+        projectsResource.createProject(secondProjectName);
+        List<Project> projects = projectsResource.getProjects();
+        Assert.assertEquals("Position of first project should be 0", 0, projects.get(0).getPosition());
+        Assert.assertEquals("Position of second project should be 1", 1, projects.get(1).getPosition());
+    }
+
+    @Test
+    public void testSwapPositionsOfProjects() {
+        String firstProjectName = "Name1";
+        String secondProjectName = "Name2";
+        projectsResource.createProject(firstProjectName);
+        projectsResource.createProject(secondProjectName);
+        projectsResource.swapPositionsOfProjects(firstProjectName, secondProjectName);
+        List<Project> projects = projectsResource.getProjects();
+        for (Project project : projects) {
+            if (project.getName().equals(firstProjectName)) {
+                Assert.assertEquals("Position of first project should now be 1", 1, project.getPosition());
+            } else if (project.getName().equals(secondProjectName)) {
+                Assert.assertEquals("Position of second project should now be 0", 0, project.getPosition());
+            } else {
+                Assert.fail("Should not return an unexpected project");
+            }
+        }
+    }
+
+    @Test
+    public void testGetProjectsOrdersProjectsByPosition() {
+        String firstProjectName = "Name1";
+        String secondProjectName = "Name2";
+        projectsResource.createProject(firstProjectName);
+        projectsResource.createProject(secondProjectName);
+        projectsResource.swapPositionsOfProjects(firstProjectName, secondProjectName);
+        List<Project> projects = projectsResource.getProjects();
+        Assert.assertEquals("Name of first project in the list should be the name of the second project after swap", secondProjectName, projects.get(0).getName());
+        Assert.assertEquals("Position of first project in the list should be 0 after swap", 0, projects.get(0).getPosition());
+        Assert.assertEquals("Name of second project in the list should be the name of the first project after swap", firstProjectName, projects.get(1).getName());
+        Assert.assertEquals("Position of second project in the list should be 1 after swap", 1, projects.get(1).getPosition());
+    }
+
+    @Test
+    public void testRemoveProjectUpdatesPositions() {
+        String firstProjectName = "Name1";
+        String secondProjectName = "Name2";
+        String thirdProjectName = "Name3";
+        projectsResource.createProject(firstProjectName);
+        projectsResource.createProject(secondProjectName);
+        projectsResource.createProject(thirdProjectName);
+        projectsResource.removeProject(firstProjectName);
+
+        List<Project> projects = projectsResource.getProjects();
+        Assert.assertEquals("Position of the first project of the returned list should be 0", 0, projects.get(0).getPosition());
+        Assert.assertEquals("Position of the second project of the returned list should be 1", 1, projects.get(1).getPosition());
+    }
 }

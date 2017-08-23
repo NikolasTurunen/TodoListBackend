@@ -288,4 +288,225 @@ public class ProjectsServiceTest {
 
         projectsService.renameProject(projectName, newProjectName);
     }
+
+    @Test
+    public void testSwapPositionOfProjects() {
+        int position1 = 1;
+        int position2 = 2;
+
+        String projectName1 = "Project1";
+        String projectName2 = "Project2";
+
+        Project project1 = new Project();
+        project1.setName(projectName1);
+        project1.setPosition(position1);
+
+        Project project2 = new Project();
+        project2.setName(projectName2);
+        project2.setPosition(position2);
+
+        Mockito.doReturn(project1).when(projectsDao).getByName(projectName1);
+        Mockito.doReturn(project2).when(projectsDao).getByName(projectName2);
+
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
+
+        projectsService.swapPositionsOfProjects(projectName1, projectName2);
+
+        Mockito.verify(projectsDao, times(2)).save(anyObject());
+        List<Project> capturedArguments = argumentCaptor.getAllValues();
+        for (Project argument : capturedArguments) {
+            if (argument == project1) {
+                Assert.assertEquals("Position of saved project1 should be the position of project2", position2, argument.getPosition());
+            } else if (argument == project2) {
+                Assert.assertEquals("Position of saved project2 should be the position of project1", position1, argument.getPosition());
+            } else {
+                Assert.fail("Should only save the specified projects");
+            }
+        }
+    }
+
+    @Test
+    public void testSwapPostionOfProjectsThrowsForNullName() {
+        try {
+            projectsService.swapPositionsOfProjects(null, "Name2");
+            Assert.fail("Should throw NullPointerException for null name");
+        } catch (NullPointerException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects("Name1", null);
+            Assert.fail("Should throw NullPointerException for null name2");
+        } catch (NullPointerException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects(null, null);
+            Assert.fail("Should throw NullPointerException when both name and name2 are null");
+        } catch (NullPointerException ex) {
+        }
+    }
+
+    @Test
+    public void testSwapPositionOfProjectsThrowsForInvalidName() {
+        try {
+            projectsService.swapPositionsOfProjects("", "Name2");
+            Assert.fail("Should throw IllegalArgumentException for empty name");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects("Name1", "");
+            Assert.fail("Should throw IllegalArgumentException for empty name2");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects("", "");
+            Assert.fail("Should throw IllegalArgumentException when both name and name2 are empty");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects(" ", "Name2");
+            Assert.fail("Should throw IllegalArgumentException for whitespace-only name");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects("Name1", " ");
+            Assert.fail("Should throw IllegalArgumentException for whitespace-only name2");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects(" ", " ");
+            Assert.fail("Should throw IllegalArgumentException when both name and name2 are whitespace-only");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testSwapPositionOfProjectsThrowsForEqualNames() {
+        projectsService.swapPositionsOfProjects("Name", "Name");
+    }
+
+    @Test
+    public void testSwapPositionOfProjectsThrowsForNonExistingProject() {
+        String projectName = "Name";
+        String projectName2 = "Name2";
+
+        Project project = new Project();
+        project.setName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+        Mockito.doReturn(null).when(projectsDao).getByName(projectName2);
+
+        try {
+            projectsService.swapPositionsOfProjects(projectName, projectName2);
+            Assert.fail("Should throw ProjectDoesNotExistException if first project does not exist");
+        } catch (ProjectDoesNotExistException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects(projectName2, projectName);
+            Assert.fail("Should throw ProjectDoesNotExistException if second project does not exist");
+        } catch (ProjectDoesNotExistException ex) {
+        }
+
+        Mockito.doReturn(null).when(projectsDao).getByName(projectName);
+
+        try {
+            projectsService.swapPositionsOfProjects(projectName, projectName2);
+            Assert.fail("Should throw ProjectDoesNotExistException if neither project does not exist");
+        } catch (ProjectDoesNotExistException ex) {
+        }
+    }
+
+    @Test
+    public void testCreateProjectSetsPositionOfZeroForFirstProject() {
+        Mockito.doReturn(new ArrayList<>()).when(projectsDao).getAll();
+
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
+
+        projectsService.createProject("Project");
+
+        Assert.assertEquals("Position of zero should be assigned to the first project", 0, argumentCaptor.getValue().getPosition());
+    }
+
+    @Test
+    public void testCreateProjectSetsPositionOfOneForSecondProject() {
+        List<Project> projects = new ArrayList<>();
+        projects.add(new Project());
+        Mockito.doReturn(projects).when(projectsDao).getAll();
+
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
+
+        projectsService.createProject("Project");
+
+        Assert.assertEquals("Position of 1 should be assigned to the second project", 1, argumentCaptor.getValue().getPosition());
+    }
+
+    @Test
+    public void testRemoveProjectUpdatesPositions() {
+        List<Project> projects = new ArrayList<>();
+
+        String projectNameToRemove = "Project2";
+
+        Project projectToRemove = new Project();
+        projectToRemove.setName(projectNameToRemove);
+        projectToRemove.setPosition(1);
+
+        Project project1 = new Project();
+        project1.setName("Project1");
+        project1.setPosition(0);
+        projects.add(project1);
+
+        Project project3 = new Project();
+        project3.setName("Project3");
+        project3.setPosition(2);
+        projects.add(project3);
+
+        Project project4 = new Project();
+        project4.setName("Project4");
+        project4.setPosition(3);
+        projects.add(project4);
+
+        ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
+        Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
+
+        Mockito.doReturn(projectToRemove).when(projectsDao).getByName(projectNameToRemove);
+
+        Mockito.doReturn(projects).when(projectsDao).getAll();
+
+        projectsService.removeProject(projectNameToRemove);
+
+        Mockito.verify(projectsDao, times(2)).save(anyObject());
+
+        for (Project argument : argumentCaptor.getAllValues()) {
+            if (argument == project3) {
+                Assert.assertEquals("Position of project 3 should be saved to 1", 1, argument.getPosition());
+            } else if (argument == project4) {
+                Assert.assertEquals("Position of project 4 should be saved to 2", 2, argument.getPosition());
+            } else {
+                Assert.fail("Should not save any other projects");
+            }
+        }
+    }
+
+    @Test
+    public void testRemoveProjectThatIsLastDoesNotSaveAnything() {
+        String projectName = "Name";
+        Project project = new Project();
+        project.setName(projectName);
+
+        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+
+        Mockito.doReturn(new ArrayList<>()).when(projectsDao).getAll();
+
+        projectsService.removeProject(projectName);
+
+        Mockito.verify(projectsDao, times(0)).save(anyObject());
+    }
 }

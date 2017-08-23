@@ -34,8 +34,12 @@ public class ProjectsServiceImpl implements ProjectsService {
 
         verifyProjectDoesNotExist(name);
 
+        int position = projectsDao.getAll().size();
+
         Project project = new Project();
         project.setName(name);
+        project.setPosition(position);
+
         projectsDao.save(project);
     }
 
@@ -54,6 +58,23 @@ public class ProjectsServiceImpl implements ProjectsService {
         }
 
         projectsDao.remove(project);
+
+        decrementPositionsOfProjectsWithHigherPosition(project.getPosition());
+    }
+
+    /**
+     * Decrements positions of all projects that have a higher position than the specified position.
+     *
+     * @param position Position threshold.
+     */
+    private void decrementPositionsOfProjectsWithHigherPosition(int position) {
+        List<Project> projects = projectsDao.getAll();
+        for (Project project : projects) {
+            if (project.getPosition() > position) {
+                project.setPosition(project.getPosition() - 1);
+                projectsDao.save(project);
+            }
+        }
     }
 
     @Override
@@ -75,6 +96,47 @@ public class ProjectsServiceImpl implements ProjectsService {
     }
 
     /**
+     * Verifies that no project with the specified name exists.
+     *
+     * @param name Name of the project to check.
+     * @throws ProjectAlreadyExistsException Thrown if a project with the specified name exists.
+     */
+    private void verifyProjectDoesNotExist(String name) {
+        Project existingProject = projectsDao.getByName(name);
+        if (existingProject != null) {
+            throw new ProjectAlreadyExistsException("Project with the name " + name + " already exists");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void swapPositionsOfProjects(String name, String name2) {
+        validateName(name);
+        validateName(name2);
+
+        if (name.equals(name2)) {
+            throw new IllegalArgumentException("Project cannot swap position with itself");
+        }
+
+        Project project1 = projectsDao.getByName(name);
+        if (project1 == null) {
+            throw new ProjectDoesNotExistException("Project with the name " + name + " does not exist");
+        }
+
+        Project project2 = projectsDao.getByName(name2);
+        if (project2 == null) {
+            throw new ProjectDoesNotExistException("Project with the name " + name2 + " does not exist");
+        }
+
+        int positionOfProject1 = project1.getPosition();
+        project1.setPosition(project2.getPosition());
+        project2.setPosition(positionOfProject1);
+
+        projectsDao.save(project1);
+        projectsDao.save(project2);
+    }
+
+    /**
      * Validates the specified project name.
      *
      * @param name Name to be validated.
@@ -88,19 +150,6 @@ public class ProjectsServiceImpl implements ProjectsService {
 
         if (name.trim().isEmpty()) {
             throw new IllegalArgumentException("Project name must not be empty or whitespace-only");
-        }
-    }
-
-    /**
-     * Verifies that no project with the specified name exists.
-     *
-     * @param name Name of the project to check.
-     * @throws ProjectAlreadyExistsException Thrown if a project with the specified name exists.
-     */
-    private void verifyProjectDoesNotExist(String name) {
-        Project existingProject = projectsDao.getByName(name);
-        if (existingProject != null) {
-            throw new ProjectAlreadyExistsException("Project with the name " + name + " already exists");
         }
     }
 }

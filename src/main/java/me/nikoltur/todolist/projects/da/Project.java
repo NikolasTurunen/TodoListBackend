@@ -23,6 +23,8 @@ public class Project implements Serializable {
     private int id;
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+    @Column(name = "position", nullable = false)
+    private int position;
 
     public int getId() {
         return id;
@@ -34,5 +36,13 @@ public class Project implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

@@ -11,9 +11,9 @@ import me.nikoltur.todolist.projects.da.Project;
 public interface ProjectsService {
 
     /**
-     * Returns a list containing all projects.
+     * Returns a list containing all projects ordered by their position.
      *
-     * @return A list containing all projects.
+     * @return A list containing all projects ordered by their position.
      */
     public List<Project> getProjects();
 
@@ -49,4 +49,15 @@ public interface ProjectsService {
      * @throws IllegalArgumentException Thrown if the specified name or newName is empty.
      */
     public void renameProject(String name, String newName);
+
+    /**
+     * Swaps the positions of the specified projects.
+     *
+     * @param name Name of the first project.
+     * @param name2 Name of the second project.
+     * @throws ProjectDoesNotExistException Thrown if no project with the specified name or name2 exists.
+     * @throws NullPointerException Thrown if the specified name or name2 is null.
+     * @throws IllegalArgumentException Thrown if the specified name or name2 is empty or whitespace-only. Or if the specified name equals the specified name2.
+     */
+    public void swapPositionsOfProjects(String name, String name2);
 }

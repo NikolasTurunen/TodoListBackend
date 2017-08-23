@@ -23,7 +23,7 @@ public class ProjectsDaoImpl implements ProjectsDao {
     public List<Project> getAll() {
         Session session = sessionFactory.getCurrentSession();
 
-        TypedQuery<Project> query = session.createQuery("from Project p");
+        TypedQuery<Project> query = session.createQuery("from Project p order by p.position");
 
         return query.getResultList();
     }

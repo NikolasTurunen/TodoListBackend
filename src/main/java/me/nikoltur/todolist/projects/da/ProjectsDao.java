@@ -10,9 +10,9 @@ import java.util.List;
 public interface ProjectsDao {
 
     /**
-     * Returns a list containing all projects.
+     * Returns a list containing all projects ordered by their position.
      *
-     * @return A list containing all projects.
+     * @return A list containing all projects ordered by their position.
      */
     public List<Project> getAll();
 

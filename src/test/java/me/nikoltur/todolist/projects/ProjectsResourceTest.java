@@ -74,4 +74,14 @@ public class ProjectsResourceTest {
 
         Mockito.verify(projectsService, times(1)).renameProject(projectName, newProjectName);
     }
+
+    @Test
+    public void testSwapPositions() {
+        String projectName1 = "Project1";
+        String projectName2 = "Project2";
+
+        projectsResource.swapPositionsOfProjects(projectName1, projectName2);
+
+        Mockito.verify(projectsService, times(1)).swapPositionsOfProjects(projectName1, projectName2);
+    }
 }
