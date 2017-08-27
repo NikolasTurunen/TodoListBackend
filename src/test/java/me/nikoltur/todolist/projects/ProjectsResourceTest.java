@@ -60,10 +60,10 @@ public class ProjectsResourceTest {
 
     @Test
     public void testRemoveProject() {
-        String projectName = "Tested";
-        projectsResource.removeProject(projectName);
+        int projectId = 1;
+        projectsResource.removeProject(projectId);
 
-        Mockito.verify(projectsService, times(1)).removeProject(projectName);
+        Mockito.verify(projectsService, times(1)).removeProject(projectId);
     }
 
     @Test

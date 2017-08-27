@@ -66,7 +66,7 @@ public class TaskAndProjectResourcesIT {
     public void testProjectRemovalWithTasks() {
         Project project = createProject("Project");
         tasksResource.createTask(project.getId(), "Mytask");
-        projectsResource.removeProject(project.getName());
+        projectsResource.removeProject(project.getId());
     }
 
     @Test
@@ -109,7 +109,7 @@ public class TaskAndProjectResourcesIT {
         Project project = createProject("Project");
         Task task = createTask(project.getId(), "Task");
         tasksResource.removeTask(task.getId());
-        projectsResource.removeProject(project.getName());
+        projectsResource.removeProject(project.getId());
 
         Assert.assertTrue("Projects should be empty after removal of task and project", projectsResource.getProjects().isEmpty());
     }

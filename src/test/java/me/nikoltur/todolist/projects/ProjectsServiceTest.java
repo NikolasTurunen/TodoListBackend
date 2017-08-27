@@ -108,60 +108,67 @@ public class ProjectsServiceTest {
 
     @Test
     public void testRemoveProject() {
+        int projectId = 1;
         String projectName = "Testit";
 
         Project project = new Project();
         project.setName(projectName);
 
-        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
 
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).remove(argumentCaptor.capture());
 
         Mockito.doReturn(new ArrayList<>()).when(tasksDao).getAllOf(project.getId());
 
-        projectsService.removeProject(projectName);
+        projectsService.removeProject(projectId);
         Mockito.verify(projectsDao, times(1)).remove(anyObject());
         Assert.assertEquals("Project name should be equal to the specified", projectName, argumentCaptor.getValue().getName());
     }
 
     @Test
     public void testRemoveProjectThrowsWhenProjectDoesNotExist() {
-        String projectName = "Testa";
-        Mockito.doReturn(null).when(projectsDao).getByName(projectName);
+        int projectId = 1;
+        Mockito.doReturn(null).when(projectsDao).getById(projectId);
         Mockito.doNothing().when(projectsDao).remove(anyObject());
 
         try {
-            projectsService.removeProject(projectName);
+            projectsService.removeProject(projectId);
             Assert.fail(); // Fail if no exception is caught.
         } catch (ProjectDoesNotExistException ex) {
             Assert.assertSame("Exception type should be ProjectDoesNotExistException", ProjectDoesNotExistException.class, ex.getClass());
         }
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testRemoveProjectThrowsForNullName() {
-        projectsService.removeProject(null);
-    }
+    @Test
+    public void testRemoveProjectThrowsForIllegalId() {
+        try {
+            projectsService.removeProject(0);
+            Assert.fail("Should throw for zero id");
+        } catch (IllegalArgumentException ex) {
+        }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testRemoveProjectThrowsForEmptyName() {
-        projectsService.removeProject("");
-    }
+        try {
+            projectsService.removeProject(-1);
+            Assert.fail("Should throw for negative id");
+        } catch (IllegalArgumentException ex) {
+        }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testRemoveProjectThrowsForWhitespaceOnlyName() {
-        projectsService.removeProject(" ");
+        try {
+            projectsService.removeProject(-265);
+            Assert.fail("Should throw for negative id");
+        } catch (IllegalArgumentException ex) {
+        }
     }
 
     @Test(expected = ProjectHasTasksException.class)
     public void testRemoveProjectThrowsIfProjectHasTasks() {
-        String projectName = "Project name";
+        int projectId = 1;
 
         Project project = new Project();
-        project.setName(projectName);
+        project.setName("Project name");
 
-        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
 
         List<Task> tasks = new ArrayList<>();
         Task task = new Task();
@@ -170,7 +177,7 @@ public class ProjectsServiceTest {
         tasks.add(task);
 
         Mockito.doReturn(tasks).when(tasksDao).getAllOf(anyInt());
-        projectsService.removeProject(projectName);
+        projectsService.removeProject(projectId);
     }
 
     @Test
@@ -452,10 +459,10 @@ public class ProjectsServiceTest {
     public void testRemoveProjectUpdatesPositions() {
         List<Project> projects = new ArrayList<>();
 
-        String projectNameToRemove = "Project2";
+        int projectIdToRemove = 1;
 
         Project projectToRemove = new Project();
-        projectToRemove.setName(projectNameToRemove);
+        projectToRemove.setName("Project to remove");
         projectToRemove.setPosition(1);
 
         Project project1 = new Project();
@@ -476,11 +483,11 @@ public class ProjectsServiceTest {
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
 
-        Mockito.doReturn(projectToRemove).when(projectsDao).getByName(projectNameToRemove);
+        Mockito.doReturn(projectToRemove).when(projectsDao).getById(projectIdToRemove);
 
         Mockito.doReturn(projects).when(projectsDao).getAll();
 
-        projectsService.removeProject(projectNameToRemove);
+        projectsService.removeProject(projectIdToRemove);
 
         Mockito.verify(projectsDao, times(2)).save(anyObject());
 
@@ -497,15 +504,15 @@ public class ProjectsServiceTest {
 
     @Test
     public void testRemoveProjectThatIsLastDoesNotSaveAnything() {
-        String projectName = "Name";
+        int projectId = 1;
         Project project = new Project();
-        project.setName(projectName);
+        project.setName("Name");
 
-        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
 
         Mockito.doReturn(new ArrayList<>()).when(projectsDao).getAll();
 
-        projectsService.removeProject(projectName);
+        projectsService.removeProject(projectId);
 
         Mockito.verify(projectsDao, times(0)).save(anyObject());
     }

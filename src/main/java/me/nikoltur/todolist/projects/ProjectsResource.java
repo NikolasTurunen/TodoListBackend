@@ -41,13 +41,13 @@ public class ProjectsResource {
     }
 
     /**
-     * Removes the project with the specified name.
+     * Removes the project with the specified id.
      *
-     * @param name Name of the project to be removed.
+     * @param projectId Id of the project to be removed.
      */
     @PostMapping(BASE_PATH + "/remove")
-    public void removeProject(@RequestParam("name") String name) {
-        projectsService.removeProject(name);
+    public void removeProject(@RequestParam("projectId") int projectId) {
+        projectsService.removeProject(projectId);
     }
 
     /**

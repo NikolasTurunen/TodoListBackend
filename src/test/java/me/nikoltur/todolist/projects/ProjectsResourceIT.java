@@ -67,19 +67,24 @@ public class ProjectsResourceIT {
         projectsResource.createProject("p1");
         projectsResource.createProject(nameOfProjectToBeRemoved);
 
-        projectsResource.removeProject(nameOfProjectToBeRemoved);
-
         List<Project> projects = projectsResource.getProjects();
-        Assert.assertEquals("Size should be 1", 1, projects.size());
-        Assert.assertNotEquals("Name of the single project left should not be the same as of the removed project", nameOfProjectToBeRemoved, projects.get(0).getName());
+        for (Project project : projects) {
+            if (project.getName().equals(nameOfProjectToBeRemoved)) {
+                projectsResource.removeProject(project.getId());
+            }
+        }
+
+        List<Project> projectsAfterRemoval = projectsResource.getProjects();
+        Assert.assertEquals("Size should be 1", 1, projectsAfterRemoval.size());
+        Assert.assertNotEquals("Name of the single project left should not be the same as of the removed project", nameOfProjectToBeRemoved, projectsAfterRemoval.get(0).getName());
     }
 
     @Test
     public void testRemoveProjectThrowsIfProjectDoesNotExist() {
-        String projectName = "p";
+        int projectId = 1;
 
         try {
-            projectsResource.removeProject(projectName);
+            projectsResource.removeProject(projectId);
             Assert.fail();
         } catch (ProjectDoesNotExistException ex) {
             Assert.assertSame("Should throw ProjectDoesNotExistException if a project with the specified name does not exist", ProjectDoesNotExistException.class, ex.getClass());
@@ -168,7 +173,12 @@ public class ProjectsResourceIT {
         projectsResource.createProject(firstProjectName);
         projectsResource.createProject(secondProjectName);
         projectsResource.createProject(thirdProjectName);
-        projectsResource.removeProject(firstProjectName);
+
+        for (Project project : projectsResource.getProjects()) {
+            if (project.getName().equals(firstProjectName)) {
+                projectsResource.removeProject(project.getId());
+            }
+        }
 
         List<Project> projects = projectsResource.getProjects();
         Assert.assertEquals("Position of the first project of the returned list should be 0", 0, projects.get(0).getPosition());

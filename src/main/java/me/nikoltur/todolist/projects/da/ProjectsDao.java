@@ -25,6 +25,14 @@ public interface ProjectsDao {
     public Project getByName(String name);
 
     /**
+     * Returns the project with the specified id. Null if no project with the specified id exists.
+     *
+     * @param id Id of the project to get.
+     * @return The project with the specified id if it exists. Null otherwise.
+     */
+    public Project getById(int projectId);
+
+    /**
      * Checks if a project with the specified id exists.
      *
      * @param projectId Id of the project to check.

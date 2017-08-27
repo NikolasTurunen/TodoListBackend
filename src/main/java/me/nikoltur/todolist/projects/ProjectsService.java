@@ -28,15 +28,14 @@ public interface ProjectsService {
     public void createProject(String name);
 
     /**
-     * Removes the project with the specified name.
+     * Removes the project with the specified id.
      *
-     * @param name Name of the project to be removed.
-     * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
-     * @throws ProjectHasTasksException Thrown if the project with the specified name still has tasks referencing to it.
-     * @throws NullPointerException Thrown if the specified name is null.
-     * @throws IllegalArgumentException Thrown if the specified name is invalid.
+     * @param projectId Id of the project to be removed.
+     * @throws ProjectDoesNotExistException Thrown if no project with the specified id exists.
+     * @throws ProjectHasTasksException Thrown if the project with the specified id still has tasks referencing to it.
+     * @throws IllegalArgumentException Thrown if the specified id is invalid.
      */
-    public void removeProject(String name);
+    public void removeProject(int projectId);
 
     /**
      * Renames the specified project with the specified name to the specified newName.

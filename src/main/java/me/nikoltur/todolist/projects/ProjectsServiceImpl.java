@@ -45,16 +45,16 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void removeProject(String name) {
-        validateName(name);
+    public void removeProject(int projectId) {
+        validateId(projectId);
 
-        Project project = projectsDao.getByName(name);
+        Project project = projectsDao.getById(projectId);
         if (project == null) {
-            throw new ProjectDoesNotExistException("Project with the name " + name + " does not exist");
+            throw new ProjectDoesNotExistException("Project with the id " + projectId + " does not exist");
         }
 
         if (!tasksDao.getAllOf(project.getId()).isEmpty()) {
-            throw new ProjectHasTasksException("Project with the name " + name + " cannot be removed because there are tasks referencing to it");
+            throw new ProjectHasTasksException("Project with the id " + projectId + " cannot be removed because there are tasks referencing to it");
         }
 
         projectsDao.remove(project);
@@ -150,6 +150,18 @@ public class ProjectsServiceImpl implements ProjectsService {
 
         if (name.trim().isEmpty()) {
             throw new IllegalArgumentException("Project name must not be empty or whitespace-only");
+        }
+    }
+
+    /**
+     * Validates the specified project id.
+     *
+     * @param projectId Project id to be validated.
+     * @throws IllegalArgumentException Thrown if the specified id is zero or negative.
+     */
+    private void validateId(int projectId) {
+        if (projectId <= 0) {
+            throw new IllegalArgumentException("Project id must not be zero or negative");
         }
     }
 }
