@@ -90,6 +90,7 @@ public class TasksServiceTest {
 
         Assert.assertEquals("Saved task should have the specified id", projectId, argumentCaptor.getValue().getProjectId());
         Assert.assertEquals("Saved task should have the specified task string", taskString, argumentCaptor.getValue().getTaskString());
+        Assert.assertNull("Parent task id of the saved task should be set to null", argumentCaptor.getValue().getParentTaskId());
     }
 
     @Test
