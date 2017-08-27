@@ -86,4 +86,14 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService, times(1)).createDetail(taskId, taskDetail);
     }
+
+    @Test
+    public void testSwapPositionsOfTasks() {
+        int taskId = 1;
+        int taskId2 = 2;
+
+        tasksResource.swapPositionsOfTasks(taskId, taskId2);
+
+        Mockito.verify(tasksService, times(1)).swapPositionsOfTasks(taskId, taskId2);
+    }
 }

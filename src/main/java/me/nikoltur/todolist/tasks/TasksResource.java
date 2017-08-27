@@ -21,10 +21,10 @@ public class TasksResource {
     private TasksService tasksService;
 
     /**
-     * Returns a list containing tasks of the specified project.
+     * Returns a list containing tasks of the specified project ordered by their position.
      *
      * @param projectId Id of the project.
-     * @return A list containing tasks of the specified project.
+     * @return A list containing tasks of the specified project ordered by their position.
      */
     @GetMapping(BASE_PATH)
     public List<Task> getTasks(@RequestParam("projectId") int projectId) {
@@ -72,5 +72,16 @@ public class TasksResource {
     @PostMapping(BASE_PATH + "/createdetail")
     public void createDetail(@RequestParam("taskId") int taskId, @RequestParam("detail") String detail) {
         tasksService.createDetail(taskId, detail);
+    }
+
+    /**
+     * Swaps the positions of the specified tasks.
+     *
+     * @param taskId Id of the first task.
+     * @param taskId2 Id of the second task.
+     */
+    @PostMapping(BASE_PATH + "/swappositions")
+    public void swapPositionsOfTasks(@RequestParam("taskId") int taskId, @RequestParam("taskId2") int taskId2) {
+        tasksService.swapPositionsOfTasks(taskId, taskId2);
     }
 }

@@ -10,10 +10,10 @@ import java.util.List;
 public interface TasksDao {
 
     /**
-     * Returns a list containing all tasks of the specified project.
+     * Returns a list containing all tasks of the specified project ordered by their position.
      *
      * @param projectId Id of the project.
-     * @return A list containing all tasks of the specified project.
+     * @return A list containing all tasks of the specified project ordered by their position.
      */
     public List<Task> getAllOf(int projectId);
 

@@ -270,6 +270,92 @@ public class TaskAndProjectResourcesIT {
         Assert.assertEquals("Task string of detail of detail should match the created detail", detailOfDetailString, updatedDetail.getDetails().get(0).getTaskString());
     }
 
+    @Test
+    public void testSwapPositionsOfTasks() {
+        String taskString1 = "task";
+        String taskString2 = "task2";
+
+        String projectName = "Project";
+
+        Project project = createProject(projectName);
+        Task task1 = createTask(project.getId(), taskString1);
+        Task task2 = createTask(project.getId(), taskString2);
+        int task1Position = task1.getPosition();
+        int task2Position = task2.getPosition();
+
+        tasksResource.swapPositionsOfTasks(task1.getId(), task2.getId());
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+        for (Task task : tasks) {
+            if (task.getTaskString().equals(taskString1)) {
+                Assert.assertEquals("Position of task1 should be updated to position of task2", task2Position, task.getPosition());
+            } else if (task.getTaskString().equals(taskString2)) {
+                Assert.assertEquals("Position of task2 should be updated to position of task1", task1Position, task.getPosition());
+            } else {
+                Assert.fail("No unexpected tasks should be returned");
+            }
+        }
+    }
+
+    @Test
+    public void testGetTasksOrdersByPosition() {
+        Project project = createProject("Project");
+        Task task1 = createTask(project.getId(), "Task1");
+        Task task2 = createTask(project.getId(), "Task2");
+
+        tasksResource.swapPositionsOfTasks(task1.getId(), task2.getId());
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+
+        Assert.assertEquals("First task should have the task string of task2 task after swap", task2.getTaskString(), tasks.get(0).getTaskString());
+        Assert.assertEquals("Second task should have the task string of task task after swap", task1.getTaskString(), tasks.get(1).getTaskString());
+    }
+
+    @Test
+    public void testCreateTaskSavesPosition() {
+        Project project = createProject("Project");
+        createTask(project.getId(), "Task1");
+        createTask(project.getId(), "Task2");
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+        Assert.assertEquals("Position of first task should be 0", 0, tasks.get(0).getPosition());
+        Assert.assertEquals("Position of second task should be 1", 1, tasks.get(1).getPosition());
+    }
+
+    @Test
+    public void testRemoveTaskUpdatesPositions() {
+        Project project = createProject("Project");
+        createTask(project.getId(), "Task1");
+        Task taskToRemove = createTask(project.getId(), "Task2");
+        createTask(project.getId(), "Task3");
+        tasksResource.removeTask(taskToRemove.getId());
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+        Assert.assertEquals("Position of first task should still be 0", 0, tasks.get(0).getPosition());
+        Assert.assertEquals("Position of second task should be updated to 1", 1, tasks.get(1).getPosition());
+    }
+
+    @Test
+    public void testSwapPositionsOfTasksDetails() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        Task detail1 = createDetailForTask(task, "Detail1");
+        Task detail2 = createDetailForTask(task, "Detail2");
+
+        tasksResource.swapPositionsOfTasks(detail1.getId(), detail2.getId());
+
+        Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
+        for (Task detail : updatedTask.getDetails()) {
+            if (detail.getTaskString().equals(detail1.getTaskString())) {
+                Assert.assertEquals("Position of first detail should be 1 after swap", 1, detail.getPosition());
+            } else if (detail.getTaskString().equals(detail2.getTaskString())) {
+                Assert.assertEquals("Position of second detail should be 0 after swap", 0, detail.getPosition());
+            } else {
+                Assert.fail("Should not return an unexpected task detail");
+            }
+        }
+    }
+
     /**
      * Creates a project with the specified name and returns the created project.
      *

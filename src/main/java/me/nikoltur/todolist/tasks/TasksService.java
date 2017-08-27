@@ -11,10 +11,10 @@ import me.nikoltur.todolist.tasks.da.Task;
 public interface TasksService {
 
     /**
-     * Return a list containing tasks of the specified project.
+     * Return a list containing tasks of the specified project ordered by their position.
      *
      * @param projectId Id of the project.
-     * @return A list containing tasks of the specified project.
+     * @return A list containing tasks of the specified project ordered by their position.
      * @throws IllegalArgumentException Thrown if the specified projectId is negative or zero.
      */
     public List<Task> getTasks(int projectId);
@@ -61,4 +61,17 @@ public interface TasksService {
      * @throws NullPointerException Thrown if the specified detail is null.
      */
     public void createDetail(int taskId, String detail);
+
+    /**
+     * Swaps the positions of the specified tasks.
+     *
+     * @param taskId Id of the first task.
+     * @param taskId2 Id of the second task.
+     * @throws TaskDoesNotExistException Thrown if no task with the specified taskId or taskId2 exists.
+     * @throws IllegalArgumentException Thrown if the specified taskId or taskId2 is negative or zero.
+     * Or if the specified taskId equals the specified taskId2.
+     * Or if the project ids of the tasks are not equal.
+     * Or if the parent task ids of the tasks are not equal.
+     */
+    public void swapPositionsOfTasks(int taskId, int taskId2);
 }

@@ -33,6 +33,8 @@ public class Task implements Serializable {
     @OneToMany
     @JoinColumn(name = "parent_task_id", referencedColumnName = "id")
     private List<Task> details;
+    @Column(name = "position", nullable = false)
+    private int position;
 
     public int getId() {
         return id;
@@ -64,5 +66,13 @@ public class Task implements Serializable {
 
     public List<Task> getDetails() {
         return details;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

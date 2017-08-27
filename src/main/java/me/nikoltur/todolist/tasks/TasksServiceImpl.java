@@ -1,6 +1,7 @@
 package me.nikoltur.todolist.tasks;
 
 import java.util.List;
+import java.util.Objects;
 import javax.transaction.Transactional;
 import me.nikoltur.todolist.projects.ProjectDoesNotExistException;
 import me.nikoltur.todolist.projects.da.ProjectsDao;
@@ -40,9 +41,12 @@ public class TasksServiceImpl implements TasksService {
             throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
         }
 
+        int position = getTasks(projectId).size();
+
         Task task = new Task();
         task.setProjectId(projectId);
         task.setTaskString(taskString);
+        task.setPosition(position);
 
         tasksDao.save(task);
     }
@@ -71,6 +75,19 @@ public class TasksServiceImpl implements TasksService {
         }
 
         tasksDao.remove(task);
+
+        List<Task> remainingTasks;
+        if (task.getProjectId() != null) {
+            remainingTasks = tasksDao.getAllOf(task.getProjectId());
+        } else {
+            remainingTasks = tasksDao.getById(task.getParentTaskId()).getDetails();
+        }
+        for (Task remainingTask : remainingTasks) {
+            if (remainingTask.getPosition() > task.getPosition()) {
+                remainingTask.setPosition(remainingTask.getPosition() - 1);
+                tasksDao.save(remainingTask);
+            }
+        }
     }
 
     @Override
@@ -100,23 +117,14 @@ public class TasksServiceImpl implements TasksService {
             throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
         }
 
+        int position = parentTask.getDetails().size();
+
         Task task = new Task();
         task.setParentTaskId(taskId);
         task.setTaskString(detail);
+        task.setPosition(position);
 
         tasksDao.save(task);
-    }
-
-    /**
-     * Validates the specified taskId.
-     *
-     * @param taskId Task id to be validated.
-     * @throws IllegalArgumentException Thrown if the specified taskId is not valid.
-     */
-    private void validateTaskId(int taskId) {
-        if (taskId <= 0) {
-            throw new IllegalArgumentException("Task id must be greater than zero");
-        }
     }
 
     /**
@@ -128,6 +136,58 @@ public class TasksServiceImpl implements TasksService {
     private void validateTaskString(String taskString) {
         if (taskString == null) {
             throw new NullPointerException("Task string cannot be null");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void swapPositionsOfTasks(int taskId, int taskId2) {
+        validateTaskId(taskId);
+        validateTaskId(taskId2);
+
+        if (taskId == taskId2) {
+            throw new IllegalArgumentException("Cannot swap position with itself");
+        }
+
+        Task task1 = tasksDao.getById(taskId);
+        if (task1 == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
+        }
+
+        Task task2 = tasksDao.getById(taskId2);
+        if (task2 == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId2 + " exists");
+        }
+
+        if ((task1.getProjectId() == null && task2.getProjectId() != null) || (task1.getParentTaskId() == null && task2.getParentTaskId() != null)) {
+            throw new IllegalArgumentException("The specified tasks must both be either tasks or details of tasks, not mixed");
+        }
+
+        if (!Objects.equals(task1.getProjectId(), task2.getProjectId())) {
+            throw new IllegalArgumentException("Project ids of the specified tasks must be equal");
+        }
+
+        if (!Objects.equals(task1.getParentTaskId(), task2.getParentTaskId())) {
+            throw new IllegalArgumentException("Parent task ids of the specified tasks must be equal");
+        }
+
+        int positionOfTask1 = task1.getPosition();
+        task1.setPosition(task2.getPosition());
+        task2.setPosition(positionOfTask1);
+
+        tasksDao.save(task1);
+        tasksDao.save(task2);
+    }
+
+    /**
+     * Validates the specified taskId.
+     *
+     * @param taskId Task id to be validated.
+     * @throws IllegalArgumentException Thrown if the specified taskId is not valid.
+     */
+    private void validateTaskId(int taskId) {
+        if (taskId <= 0) {
+            throw new IllegalArgumentException("Task id must be greater than zero");
         }
     }
 }
