@@ -128,6 +128,12 @@ public class ProjectsServiceImpl implements ProjectsService {
             throw new ProjectDoesNotExistException("Project with the name " + projectId2 + " does not exist");
         }
 
+        boolean project2IsPreviousFromProject1 = project2.getPosition() == project1.getPosition() + 1;
+        boolean project2IsNextFromProject = project2.getPosition() == project1.getPosition() - 1;
+        if (!project2IsPreviousFromProject1 && !project2IsNextFromProject) {
+            throw new IllegalArgumentException("The specified second project must be either previous or next from the specified first project");
+        }
+
         int positionOfProject1 = project1.getPosition();
         project1.setPosition(project2.getPosition());
         project2.setPosition(positionOfProject1);

@@ -368,6 +368,33 @@ public class ProjectsServiceTest {
     }
 
     @Test
+    public void testSwapPositionsOfProjectsThrowsForOtherThanPreviousOrNext() {
+        int projectId1 = 1;
+        int projectId2 = 2;
+
+        Project project1 = new Project();
+        project1.setPosition(1);
+
+        Project project2 = new Project();
+        project2.setPosition(3);
+
+        Mockito.doReturn(project1).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(project2).when(projectsDao).getById(projectId2);
+
+        try {
+            projectsService.swapPositionsOfProjects(projectId1, projectId2);
+            Assert.fail("Should throw IllegalArgumentException if project2 is not previous or next from project1");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            projectsService.swapPositionsOfProjects(projectId2, projectId1);
+            Assert.fail("Should throw IllegalArgumentException if project1 is not previous or next from project2");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test
     public void testCreateProjectSetsPositionOfZeroForFirstProject() {
         Mockito.doReturn(new ArrayList<>()).when(projectsDao).getAll();
 
