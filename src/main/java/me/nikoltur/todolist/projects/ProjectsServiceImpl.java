@@ -110,22 +110,22 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void swapPositionsOfProjects(String name, String name2) {
-        validateName(name);
-        validateName(name2);
+    public void swapPositionsOfProjects(int projectId, int projectId2) {
+        validateId(projectId);
+        validateId(projectId2);
 
-        if (name.equals(name2)) {
+        if (projectId == projectId2) {
             throw new IllegalArgumentException("Project cannot swap position with itself");
         }
 
-        Project project1 = projectsDao.getByName(name);
+        Project project1 = projectsDao.getById(projectId);
         if (project1 == null) {
-            throw new ProjectDoesNotExistException("Project with the name " + name + " does not exist");
+            throw new ProjectDoesNotExistException("Project with the name " + projectId + " does not exist");
         }
 
-        Project project2 = projectsDao.getByName(name2);
+        Project project2 = projectsDao.getById(projectId2);
         if (project2 == null) {
-            throw new ProjectDoesNotExistException("Project with the name " + name2 + " does not exist");
+            throw new ProjectDoesNotExistException("Project with the name " + projectId2 + " does not exist");
         }
 
         int positionOfProject1 = project1.getPosition();

@@ -77,11 +77,11 @@ public class ProjectsResourceTest {
 
     @Test
     public void testSwapPositions() {
-        String projectName1 = "Project1";
-        String projectName2 = "Project2";
+        int projectId = 1;
+        int projectId2 = 2;
 
-        projectsResource.swapPositionsOfProjects(projectName1, projectName2);
+        projectsResource.swapPositionsOfProjects(projectId, projectId2);
 
-        Mockito.verify(projectsService, times(1)).swapPositionsOfProjects(projectName1, projectName2);
+        Mockito.verify(projectsService, times(1)).swapPositionsOfProjects(projectId, projectId2);
     }
 }

@@ -52,11 +52,10 @@ public interface ProjectsService {
     /**
      * Swaps the positions of the specified projects.
      *
-     * @param name Name of the first project.
-     * @param name2 Name of the second project.
-     * @throws ProjectDoesNotExistException Thrown if no project with the specified name or name2 exists.
-     * @throws NullPointerException Thrown if the specified name or name2 is null.
-     * @throws IllegalArgumentException Thrown if the specified name or name2 is invalid. Or if the specified name equals the specified name2.
+     * @param projectId Id of the first project.
+     * @param projectId2 Id of the second project.
+     * @throws ProjectDoesNotExistException Thrown if no project with the specified projectId or projectId2 exists.
+     * @throws IllegalArgumentException Thrown if the specified projectId or projectId2 is invalid. Or if the specified projectId equals the specified projectId2.
      */
-    public void swapPositionsOfProjects(String name, String name2);
+    public void swapPositionsOfProjects(int projectId, int projectId2);
 }

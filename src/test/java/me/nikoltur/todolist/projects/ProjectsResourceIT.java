@@ -140,9 +140,9 @@ public class ProjectsResourceIT {
     public void testSwapPositionsOfProjects() {
         String firstProjectName = "Name1";
         String secondProjectName = "Name2";
-        projectsResource.createProject(firstProjectName);
-        projectsResource.createProject(secondProjectName);
-        projectsResource.swapPositionsOfProjects(firstProjectName, secondProjectName);
+        Project project1 = createProject(firstProjectName);
+        Project project2 = createProject(secondProjectName);
+        projectsResource.swapPositionsOfProjects(project1.getId(), project2.getId());
         List<Project> projects = projectsResource.getProjects();
         for (Project project : projects) {
             if (project.getName().equals(firstProjectName)) {
@@ -159,9 +159,9 @@ public class ProjectsResourceIT {
     public void testGetProjectsOrdersProjectsByPosition() {
         String firstProjectName = "Name1";
         String secondProjectName = "Name2";
-        projectsResource.createProject(firstProjectName);
-        projectsResource.createProject(secondProjectName);
-        projectsResource.swapPositionsOfProjects(firstProjectName, secondProjectName);
+        Project project1 = createProject(firstProjectName);
+        Project project2 = createProject(secondProjectName);
+        projectsResource.swapPositionsOfProjects(project1.getId(), project2.getId());
         List<Project> projects = projectsResource.getProjects();
         Assert.assertEquals("Name of first project in the list should be the name of the second project after swap", secondProjectName, projects.get(0).getName());
         Assert.assertEquals("Position of first project in the list should be 0 after swap", 0, projects.get(0).getPosition());
@@ -187,5 +187,22 @@ public class ProjectsResourceIT {
         List<Project> projects = projectsResource.getProjects();
         Assert.assertEquals("Position of the first project of the returned list should be 0", 0, projects.get(0).getPosition());
         Assert.assertEquals("Position of the second project of the returned list should be 1", 1, projects.get(1).getPosition());
+    }
+
+    /**
+     * Creates a project with the specified name and returns it.
+     *
+     * @param name Name of the project to be created.
+     * @return The created project.
+     */
+    private Project createProject(String name) {
+        projectsResource.createProject(name);
+        for (Project project : projectsResource.getProjects()) {
+            if (project.getName().equals(name)) {
+                return project;
+            }
+        }
+
+        throw new IllegalStateException("The created project was not found");
     }
 }

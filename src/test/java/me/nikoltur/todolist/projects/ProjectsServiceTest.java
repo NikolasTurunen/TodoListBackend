@@ -260,24 +260,24 @@ public class ProjectsServiceTest {
         int position1 = 1;
         int position2 = 2;
 
-        String projectName1 = "Project1";
-        String projectName2 = "Project2";
+        int projectId1 = 1;
+        int projectId2 = 2;
 
         Project project1 = new Project();
-        project1.setName(projectName1);
+        project1.setName("Project1");
         project1.setPosition(position1);
 
         Project project2 = new Project();
-        project2.setName(projectName2);
+        project2.setName("Project2");
         project2.setPosition(position2);
 
-        Mockito.doReturn(project1).when(projectsDao).getByName(projectName1);
-        Mockito.doReturn(project2).when(projectsDao).getByName(projectName2);
+        Mockito.doReturn(project1).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(project2).when(projectsDao).getById(projectId2);
 
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
 
-        projectsService.swapPositionsOfProjects(projectName1, projectName2);
+        projectsService.swapPositionsOfProjects(projectId1, projectId2);
 
         Mockito.verify(projectsDao, times(2)).save(anyObject());
         List<Project> capturedArguments = argumentCaptor.getAllValues();
@@ -293,96 +293,75 @@ public class ProjectsServiceTest {
     }
 
     @Test
-    public void testSwapPostionOfProjectsThrowsForNullName() {
+    public void testSwapPositionOfProjectsThrowsForInvalidId() {
         try {
-            projectsService.swapPositionsOfProjects(null, "Name2");
-            Assert.fail("Should throw NullPointerException for null name");
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            projectsService.swapPositionsOfProjects("Name1", null);
-            Assert.fail("Should throw NullPointerException for null name2");
-        } catch (NullPointerException ex) {
-        }
-
-        try {
-            projectsService.swapPositionsOfProjects(null, null);
-            Assert.fail("Should throw NullPointerException when both name and name2 are null");
-        } catch (NullPointerException ex) {
-        }
-    }
-
-    @Test
-    public void testSwapPositionOfProjectsThrowsForInvalidName() {
-        try {
-            projectsService.swapPositionsOfProjects("", "Name2");
+            projectsService.swapPositionsOfProjects(0, 1);
             Assert.fail("Should throw IllegalArgumentException for empty name");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects("Name1", "");
+            projectsService.swapPositionsOfProjects(1, 0);
             Assert.fail("Should throw IllegalArgumentException for empty name2");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects("", "");
+            projectsService.swapPositionsOfProjects(0, 0);
             Assert.fail("Should throw IllegalArgumentException when both name and name2 are empty");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects(" ", "Name2");
-            Assert.fail("Should throw IllegalArgumentException for whitespace-only name");
+            projectsService.swapPositionsOfProjects(-1, 1);
+            Assert.fail("Should throw IllegalArgumentException for empty name");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects("Name1", " ");
-            Assert.fail("Should throw IllegalArgumentException for whitespace-only name2");
+            projectsService.swapPositionsOfProjects(1, -1);
+            Assert.fail("Should throw IllegalArgumentException for empty name2");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects(" ", " ");
-            Assert.fail("Should throw IllegalArgumentException when both name and name2 are whitespace-only");
+            projectsService.swapPositionsOfProjects(-1, -1);
+            Assert.fail("Should throw IllegalArgumentException when both name and name2 are empty");
         } catch (IllegalArgumentException ex) {
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSwapPositionOfProjectsThrowsForEqualNames() {
-        projectsService.swapPositionsOfProjects("Name", "Name");
+    public void testSwapPositionOfProjectsThrowsForEqualIds() {
+        projectsService.swapPositionsOfProjects(1, 1);
     }
 
     @Test
     public void testSwapPositionOfProjectsThrowsForNonExistingProject() {
-        String projectName = "Name";
-        String projectName2 = "Name2";
+        int projectId1 = 1;
+        int projectId2 = 2;
 
         Project project = new Project();
-        project.setName(projectName);
-        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
-        Mockito.doReturn(null).when(projectsDao).getByName(projectName2);
+        project.setName("Name");
+        Mockito.doReturn(project).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(null).when(projectsDao).getById(projectId2);
 
         try {
-            projectsService.swapPositionsOfProjects(projectName, projectName2);
+            projectsService.swapPositionsOfProjects(projectId1, projectId2);
             Assert.fail("Should throw ProjectDoesNotExistException if first project does not exist");
         } catch (ProjectDoesNotExistException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects(projectName2, projectName);
+            projectsService.swapPositionsOfProjects(projectId2, projectId1);
             Assert.fail("Should throw ProjectDoesNotExistException if second project does not exist");
         } catch (ProjectDoesNotExistException ex) {
         }
 
-        Mockito.doReturn(null).when(projectsDao).getByName(projectName);
+        Mockito.doReturn(null).when(projectsDao).getById(projectId1);
 
         try {
-            projectsService.swapPositionsOfProjects(projectName, projectName2);
+            projectsService.swapPositionsOfProjects(projectId1, projectId2);
             Assert.fail("Should throw ProjectDoesNotExistException if neither project does not exist");
         } catch (ProjectDoesNotExistException ex) {
         }

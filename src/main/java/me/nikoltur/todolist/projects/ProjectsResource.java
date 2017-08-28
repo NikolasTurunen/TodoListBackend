@@ -64,11 +64,11 @@ public class ProjectsResource {
     /**
      * Swaps the positions of the specified projects.
      *
-     * @param name Name of the first project.
-     * @param name2 Name of the second project.
+     * @param projectId Id of the first project.
+     * @param projectId2 Id of the second project.
      */
     @PostMapping(BASE_PATH + "/swappositions")
-    public void swapPositionsOfProjects(@RequestParam("name") String name, @RequestParam("name2") String name2) {
-        projectsService.swapPositionsOfProjects(name, name2);
+    public void swapPositionsOfProjects(@RequestParam("projectId") int projectId, @RequestParam("projectId2") int projectId2) {
+        projectsService.swapPositionsOfProjects(projectId, projectId2);
     }
 }
