@@ -79,15 +79,15 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void renameProject(String name, String newName) {
-        validateName(name);
+    public void renameProject(int projectId, String newName) {
+        validateId(projectId);
         validateName(newName);
 
         verifyProjectDoesNotExist(newName);
 
-        Project project = projectsDao.getByName(name);
+        Project project = projectsDao.getById(projectId);
         if (project == null) {
-            throw new ProjectDoesNotExistException("No project with the specified name exists");
+            throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
         }
 
         project.setName(newName);

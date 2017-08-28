@@ -68,11 +68,11 @@ public class ProjectsResourceTest {
 
     @Test
     public void testRenameProject() {
-        String projectName = "Project1";
+        int projectId = 1;
         String newProjectName = "NewProject1";
-        projectsResource.renameProject(projectName, newProjectName);
+        projectsResource.renameProject(projectId, newProjectName);
 
-        Mockito.verify(projectsService, times(1)).renameProject(projectName, newProjectName);
+        Mockito.verify(projectsService, times(1)).renameProject(projectId, newProjectName);
     }
 
     @Test

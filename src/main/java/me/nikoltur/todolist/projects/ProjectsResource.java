@@ -51,14 +51,14 @@ public class ProjectsResource {
     }
 
     /**
-     * Changes the name of the project with the specified name to the specified newName.
+     * Changes the name of the project with the specified id to the specified newName.
      *
-     * @param name Name of the project.
+     * @param projectId Id of the project to be renamed.
      * @param newName New name for the project.
      */
     @PostMapping(BASE_PATH + "/rename")
-    public void renameProject(@RequestParam("name") String name, @RequestParam("newName") String newName) {
-        projectsService.renameProject(name, newName);
+    public void renameProject(@RequestParam("projectId") int projectId, @RequestParam("newName") String newName) {
+        projectsService.renameProject(projectId, newName);
     }
 
     /**

@@ -38,16 +38,16 @@ public interface ProjectsService {
     public void removeProject(int projectId);
 
     /**
-     * Renames the specified project with the specified name to the specified newName.
+     * Renames the specified project with the specified id to the specified newName.
      *
-     * @param name Name of the project to be renamed.
+     * @param projectId Id of the project to be renamed.
      * @param newName New name for the project.
-     * @throws ProjectDoesNotExistException Thrown if no project with the specified name exists.
+     * @throws ProjectDoesNotExistException Thrown if no project with the specified id exists.
      * @throws ProjectAlreadyExistsException Thrown if a project with the specified newName already exists.
-     * @throws NullPointerException Thrown if the specified name or newName is null.
-     * @throws IllegalArgumentException Thrown if the specified name or newName is invalid.
+     * @throws NullPointerException Thrown if the specified newName is null.
+     * @throws IllegalArgumentException Thrown if the specified projectId or newName is invalid.
      */
-    public void renameProject(String name, String newName);
+    public void renameProject(int projectId, String newName);
 
     /**
      * Swaps the positions of the specified projects.

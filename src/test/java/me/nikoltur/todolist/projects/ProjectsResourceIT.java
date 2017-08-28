@@ -97,8 +97,9 @@ public class ProjectsResourceIT {
         String newName = "New Project Name";
 
         projectsResource.createProject(name);
+        Project project = projectsResource.getProjects().get(0);
 
-        projectsResource.renameProject(name, newName);
+        projectsResource.renameProject(project.getId(), newName);
 
         List<Project> projects = projectsResource.getProjects();
         Assert.assertEquals("Size of projects should be 1", 1, projects.size());
@@ -107,7 +108,7 @@ public class ProjectsResourceIT {
 
     @Test(expected = ProjectDoesNotExistException.class)
     public void testRenameProjectThrowsForNonExistingProject() {
-        projectsResource.renameProject("Name", "New name");
+        projectsResource.renameProject(1, "New name");
     }
 
     @Test(expected = ProjectAlreadyExistsException.class)
@@ -117,8 +118,11 @@ public class ProjectsResourceIT {
 
         projectsResource.createProject(projectName);
         projectsResource.createProject(newProjectName);
-
-        projectsResource.renameProject(projectName, newProjectName);
+        for (Project project : projectsResource.getProjects()) {
+            if (project.getName().equals(projectName)) {
+                projectsResource.renameProject(project.getId(), newProjectName);
+            }
+        }
     }
 
     @Test
