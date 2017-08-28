@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.transaction.Transactional;
 import me.nikoltur.todolist.projects.ProjectDoesNotExistException;
+import me.nikoltur.todolist.projects.da.Project;
 import me.nikoltur.todolist.projects.da.ProjectsDao;
 import me.nikoltur.todolist.tasks.da.Task;
 import me.nikoltur.todolist.tasks.da.TasksDao;
@@ -37,7 +38,8 @@ public class TasksServiceImpl implements TasksService {
         validateProjectId(projectId);
         validateTaskString(taskString);
 
-        if (!projectsDao.exists(projectId)) {
+        Project project = projectsDao.getById(projectId);
+        if (project == null) {
             throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
         }
 

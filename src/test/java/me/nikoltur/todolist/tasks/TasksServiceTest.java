@@ -84,7 +84,8 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
 
-        Mockito.doReturn(true).when(projectsDao).exists(projectId);
+        Project project = new Project();
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
 
         tasksService.createTask(projectId, taskString);
 
@@ -126,7 +127,7 @@ public class TasksServiceTest {
 
     @Test(expected = ProjectDoesNotExistException.class)
     public void testCreateTaskThrowsForNonExistingProject() {
-        Mockito.doReturn(false).when(projectsDao).exists(anyInt());
+        Mockito.doReturn(null).when(projectsDao).getById(anyInt());
 
         tasksService.createTask(1243, "");
     }
@@ -467,9 +468,7 @@ public class TasksServiceTest {
         project.setName(projectName);
         project.setPosition(0);
 
-        Mockito.doReturn(true).when(projectsDao).exists(projectId);
-
-        Mockito.doReturn(project).when(projectsDao).getByName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
 
         ArgumentCaptor<Task> argumentCaptorForFirstTask = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(argumentCaptorForFirstTask.capture());

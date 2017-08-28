@@ -33,14 +33,6 @@ public interface ProjectsDao {
     public Project getById(int projectId);
 
     /**
-     * Checks if a project with the specified id exists.
-     *
-     * @param projectId Id of the project to check.
-     * @return True if a project with the specified id exists. False otherwise.
-     */
-    public boolean exists(int projectId);
-
-    /**
      * Saves the specified project.
      *
      * @param project Project to be saved.

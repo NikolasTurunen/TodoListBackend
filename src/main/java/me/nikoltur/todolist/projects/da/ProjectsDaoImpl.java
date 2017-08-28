@@ -55,15 +55,6 @@ public class ProjectsDaoImpl implements ProjectsDao {
     }
 
     @Override
-    public boolean exists(int projectId) {
-        Session session = sessionFactory.getCurrentSession();
-        TypedQuery<Project> query = session.createQuery("from Project p where p.id = :id");
-        query.setParameter("id", projectId);
-
-        return !query.getResultList().isEmpty();
-    }
-
-    @Override
     public void save(Project project) {
         Session session = sessionFactory.getCurrentSession();
         session.save(project);
