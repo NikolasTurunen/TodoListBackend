@@ -1,10 +1,12 @@
 package me.nikoltur.todolist.tasks;
 
 import java.util.List;
+import me.nikoltur.todolist.RestControllerConfiguration;
 import me.nikoltur.todolist.tasks.da.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Nikolas Turunen
  */
 @RestController
+@RequestMapping(RestControllerConfiguration.CONTEXT_PATH)
 public class TasksResource {
 
     private static final String BASE_PATH = "/tasks";

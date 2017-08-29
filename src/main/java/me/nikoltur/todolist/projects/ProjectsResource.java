@@ -1,10 +1,12 @@
 package me.nikoltur.todolist.projects;
 
 import java.util.List;
+import me.nikoltur.todolist.RestControllerConfiguration;
 import me.nikoltur.todolist.projects.da.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Nikolas Turunen
  */
 @RestController
+@RequestMapping(RestControllerConfiguration.CONTEXT_PATH)
 public class ProjectsResource {
 
     private static final String BASE_PATH = "/projects";
