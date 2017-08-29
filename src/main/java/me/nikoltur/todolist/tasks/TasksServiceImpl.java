@@ -173,6 +173,12 @@ public class TasksServiceImpl implements TasksService {
             throw new IllegalArgumentException("Parent task ids of the specified tasks must be equal");
         }
 
+        boolean task2IsPreviousFromTask1 = task2.getPosition() == task1.getPosition() + 1;
+        boolean task2IsNextFromTask1 = task2.getPosition() == task1.getPosition() - 1;
+        if (!task2IsPreviousFromTask1 && !task2IsNextFromTask1) {
+            throw new IllegalArgumentException("The specified second task must be either previous or next from the specified first task");
+        }
+
         int positionOfTask1 = task1.getPosition();
         task1.setPosition(task2.getPosition());
         task2.setPosition(positionOfTask1);

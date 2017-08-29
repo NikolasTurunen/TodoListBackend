@@ -459,6 +459,33 @@ public class TasksServiceTest {
     }
 
     @Test
+    public void testSwapPositionsOfTasksThrowsForOtherThanPreviousOrNext() {
+        int taskId1 = 1;
+        int taskId2 = 2;
+
+        Task task1 = new Task();
+        task1.setPosition(1);
+
+        Task task2 = new Task();
+        task2.setPosition(3);
+
+        Mockito.doReturn(task1).when(tasksDao).getById(taskId1);
+        Mockito.doReturn(task2).when(tasksDao).getById(taskId2);
+
+        try {
+            tasksService.swapPositionsOfTasks(taskId1, taskId2);
+            Assert.fail("Should throw IllegalArgumentException if task2 is not previous or next from task1");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.swapPositionsOfTasks(taskId2, taskId1);
+            Assert.fail("Should throw IllegalArgumentException if task1 is not previous or next from task2");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test
     public void testCreateTaskSetsCorrectPosition() {
         String projectName = "Name";
         String taskString = "Task";
