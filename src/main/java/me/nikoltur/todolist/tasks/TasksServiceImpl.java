@@ -78,14 +78,37 @@ public class TasksServiceImpl implements TasksService {
 
         tasksDao.remove(task);
 
+        decrementPositionsOfTasksWithHigherPosition(task.getPosition(), getTasksWith(task));
+    }
+
+    /**
+     * Gets a list containing tasks that are under the same project or have the same parent task.
+     *
+     * @param task Task.
+     * @return A list containing tasks that are under the same project or have the same parent task.
+     */
+    private List<Task> getTasksWith(Task task) {
         List<Task> remainingTasks;
         if (task.getProjectId() != null) {
+            // Having project id means that the task is at the top level.
             remainingTasks = tasksDao.getAllOf(task.getProjectId());
         } else {
+            // Otherwise the task is a task detail. Get the details of the parent task.
             remainingTasks = tasksDao.getById(task.getParentTaskId()).getDetails();
         }
-        for (Task remainingTask : remainingTasks) {
-            if (remainingTask.getPosition() > task.getPosition()) {
+
+        return remainingTasks;
+    }
+
+    /**
+     * Decrements positions of tasks in the specified list of tasks that have a higher position than the specified positionThreshold.
+     *
+     * @param positionThreshold Position threshold.
+     * @param tasks Tasks to be iterated.
+     */
+    private void decrementPositionsOfTasksWithHigherPosition(int positionThreshold, List<Task> tasks) {
+        for (Task remainingTask : tasks) {
+            if (remainingTask.getPosition() > positionThreshold) {
                 remainingTask.setPosition(remainingTask.getPosition() - 1);
                 tasksDao.save(remainingTask);
             }
