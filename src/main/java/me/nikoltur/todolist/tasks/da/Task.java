@@ -2,6 +2,7 @@ package me.nikoltur.todolist.tasks.da;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +31,7 @@ public class Task implements Serializable {
     private String taskString;
     @Column(name = "parent_task_id")
     private Integer parentTaskId;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "parent_task_id", referencedColumnName = "id")
     private List<Task> details;
     @Column(name = "position", nullable = false)
