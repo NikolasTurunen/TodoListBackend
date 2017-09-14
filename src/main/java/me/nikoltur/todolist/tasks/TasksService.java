@@ -15,6 +15,7 @@ public interface TasksService {
      *
      * @param projectId Id of the project.
      * @return A list containing tasks of the specified project ordered by their position.
+     * @throws ProjectDoesNotExistException Thrown if a project with the specified projectId does not exist.
      * @throws IllegalArgumentException Thrown if the specified projectId is negative or zero.
      */
     public List<Task> getTasks(int projectId);

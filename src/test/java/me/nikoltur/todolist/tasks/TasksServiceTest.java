@@ -39,6 +39,7 @@ public class TasksServiceTest {
 
     @Test
     public void testGetTasks() {
+        int projectId = 1;
         String taskString = "Do this and do that";
 
         List<Task> tasks = new ArrayList<>();
@@ -46,10 +47,22 @@ public class TasksServiceTest {
         task.setTaskString(taskString);
         tasks.add(task);
 
-        Mockito.doReturn(tasks).when(tasksDao).getAllOf(1);
+        Project project = new Project();
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+
+        Mockito.doReturn(tasks).when(tasksDao).getAllOf(projectId);
 
         Assert.assertEquals("Size should be 1", 1, tasksService.getTasks(1).size());
         Assert.assertEquals("Task string should match", taskString, tasksService.getTasks(1).get(0).getTaskString());
+    }
+
+    @Test(expected = ProjectDoesNotExistException.class)
+    public void testGetTasksThrowsForNonExistingProject() {
+        int projectId = 1;
+
+        Mockito.doReturn(null).when(tasksDao).getAllOf(projectId);
+
+        tasksService.getTasks(projectId);
     }
 
     @Test(expected = IllegalArgumentException.class)

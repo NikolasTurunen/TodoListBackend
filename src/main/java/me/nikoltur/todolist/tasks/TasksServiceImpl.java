@@ -29,6 +29,11 @@ public class TasksServiceImpl implements TasksService {
     public List<Task> getTasks(int projectId) {
         validateProjectId(projectId);
 
+        Project project = projectsDao.getById(projectId);
+        if (project == null) {
+            throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
+        }
+
         return tasksDao.getAllOf(projectId);
     }
 
