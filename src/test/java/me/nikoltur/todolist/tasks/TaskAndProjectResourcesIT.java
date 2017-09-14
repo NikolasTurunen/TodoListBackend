@@ -345,15 +345,23 @@ public class TaskAndProjectResourcesIT {
         tasksResource.swapPositionsOfTasks(detail1.getId(), detail2.getId());
 
         Task updatedTask = tasksResource.getTasks(project.getId()).get(0);
-        for (Task detail : updatedTask.getDetails()) {
-            if (detail.getTaskString().equals(detail1.getTaskString())) {
-                Assert.assertEquals("Position of first detail should be 1 after swap", 1, detail.getPosition());
-            } else if (detail.getTaskString().equals(detail2.getTaskString())) {
-                Assert.assertEquals("Position of second detail should be 0 after swap", 0, detail.getPosition());
-            } else {
-                Assert.fail("Should not return an unexpected task detail");
-            }
-        }
+        List<Task> details = updatedTask.getDetails();
+        Assert.assertEquals("Position of first detail should be 0 after swap", 0, details.get(0).getPosition());
+        Assert.assertEquals("Task string of first detail should be the task string of the other detail after swap", detail2.getTaskString(), details.get(0).getTaskString());
+
+        Assert.assertEquals("Position of second detail should be 1 after swap", 1, details.get(1).getPosition());
+        Assert.assertEquals("Task string of second detail should be the task string of the other detail after swap", detail1.getTaskString(), details.get(1).getTaskString());
+
+        // Swap again
+        tasksResource.swapPositionsOfTasks(detail1.getId(), detail2.getId());
+
+        updatedTask = tasksResource.getTasks(project.getId()).get(0);
+        details = updatedTask.getDetails();
+        Assert.assertEquals("Position of first detail should be 0 after swap", 0, details.get(0).getPosition());
+        Assert.assertEquals("Task string of first detail should be the task string of the other detail after swap", detail1.getTaskString(), details.get(0).getTaskString());
+
+        Assert.assertEquals("Position of second detail should be 1 after swap", 1, details.get(1).getPosition());
+        Assert.assertEquals("Task string of second detail should be the task string of the other detail after swap", detail2.getTaskString(), details.get(1).getTaskString());
     }
 
     /**

@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 /**
@@ -33,6 +34,7 @@ public class Task implements Serializable {
     private Integer parentTaskId;
     @OneToMany(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "parent_task_id", referencedColumnName = "id")
+    @OrderBy("position")
     private List<Task> details;
     @Column(name = "position", nullable = false)
     private int position;
