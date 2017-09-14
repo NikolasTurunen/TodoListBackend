@@ -256,6 +256,22 @@ public class ProjectsServiceTest {
     }
 
     @Test
+    public void testRenameProjectDoesNotThrowWhenNewProjectNameIsTheCurrentName() {
+        int projectId = 1;
+        String projectName = "Project";
+
+        Project project = new Project();
+        project.setName(projectName);
+        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+
+        Project alreadyExistingProject = new Project();
+        alreadyExistingProject.setName(projectName);
+        Mockito.doReturn(alreadyExistingProject).when(projectsDao).getByName(projectName);
+
+        projectsService.renameProject(projectId, projectName);
+    }
+
+    @Test
     public void testSwapPositionOfProjects() {
         int position1 = 1;
         int position2 = 2;

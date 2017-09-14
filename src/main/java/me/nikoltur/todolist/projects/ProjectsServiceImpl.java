@@ -83,12 +83,16 @@ public class ProjectsServiceImpl implements ProjectsService {
         validateId(projectId);
         validateName(newName);
 
-        verifyProjectDoesNotExist(newName);
-
         Project project = projectsDao.getById(projectId);
         if (project == null) {
             throw new ProjectDoesNotExistException("No project with the id " + projectId + " exists");
         }
+
+        if (project.getName().equals(newName)) {
+            return;
+        }
+
+        verifyProjectDoesNotExist(newName);
 
         project.setName(newName);
 
