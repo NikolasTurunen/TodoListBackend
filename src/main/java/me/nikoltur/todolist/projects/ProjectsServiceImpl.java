@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 /**
  * Database implementation.
  *
+ * Thread safe.
+ *
  * @author Nikolas Turunen
  */
 @Service
@@ -29,7 +31,7 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void createProject(String name) {
+    public synchronized void createProject(String name) {
         validateName(name);
 
         verifyProjectDoesNotExist(name);
@@ -45,7 +47,7 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void removeProject(int projectId) {
+    public synchronized void removeProject(int projectId) {
         validateId(projectId);
 
         Project project = projectsDao.getById(projectId);
@@ -79,7 +81,7 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void renameProject(int projectId, String newName) {
+    public synchronized void renameProject(int projectId, String newName) {
         validateId(projectId);
         validateName(newName);
 
@@ -114,7 +116,7 @@ public class ProjectsServiceImpl implements ProjectsService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void swapPositionsOfProjects(int projectId, int projectId2) {
+    public synchronized void swapPositionsOfProjects(int projectId, int projectId2) {
         validateId(projectId);
         validateId(projectId2);
 

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 /**
  * Database implementation.
  *
+ * Thread safe.
+ *
  * @author Nikolas Turunen
  */
 @Service
@@ -39,7 +41,7 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void createTask(int projectId, String taskString) {
+    public synchronized void createTask(int projectId, String taskString) {
         validateProjectId(projectId);
         validateTaskString(taskString);
 
@@ -72,7 +74,7 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void removeTask(int taskId) {
+    public synchronized void removeTask(int taskId) {
         validateTaskId(taskId);
 
         Task task = tasksDao.getById(taskId);
@@ -122,7 +124,7 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void editTask(int taskId, String newTask) {
+    public synchronized void editTask(int taskId, String newTask) {
         validateTaskId(taskId);
         validateTaskString(newTask);
 
@@ -138,7 +140,7 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void createDetail(int taskId, String detail) {
+    public synchronized void createDetail(int taskId, String detail) {
         validateTaskId(taskId);
         validateTaskString(detail);
 
@@ -171,7 +173,7 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void swapPositionsOfTasks(int taskId, int taskId2) {
+    public synchronized void swapPositionsOfTasks(int taskId, int taskId2) {
         validateTaskId(taskId);
         validateTaskId(taskId2);
 
