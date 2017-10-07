@@ -96,7 +96,7 @@ public class TasksResource {
      * @param taskId Id of the task.
      */
     @PostMapping(BASE_PATH + "/complete")
-    public void completeTask(int taskId) {
+    public void completeTask(@RequestParam("taskId") int taskId) {
         tasksService.completeTask(taskId);
     }
 }
