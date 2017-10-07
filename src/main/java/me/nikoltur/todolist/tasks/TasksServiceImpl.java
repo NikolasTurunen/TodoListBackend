@@ -217,6 +217,24 @@ public class TasksServiceImpl implements TasksService {
         tasksDao.save(task2);
     }
 
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public synchronized void completeTask(int taskId) {
+        validateTaskId(taskId);
+
+        Task task = tasksDao.getById(taskId);
+        if (task == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
+        }
+
+        if (task.isCompleted()) {
+            throw new TaskAlreadyCompletedException("The specified task is already completed");
+        }
+
+        task.setCompleted(true);
+        tasksDao.save(task);
+    }
+
     /**
      * Validates the specified taskId.
      *

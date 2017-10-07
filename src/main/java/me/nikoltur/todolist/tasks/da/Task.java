@@ -38,6 +38,8 @@ public class Task implements Serializable {
     private List<Task> details;
     @Column(name = "position", nullable = false)
     private int position;
+    @Column(name = "completed", nullable = false)
+    private boolean completed;
 
     public int getId() {
         return id;
@@ -77,5 +79,13 @@ public class Task implements Serializable {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
     }
 }

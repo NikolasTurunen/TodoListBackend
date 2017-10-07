@@ -75,4 +75,14 @@ public interface TasksService {
      * Or if the parent task ids of the tasks are not equal.
      */
     public void swapPositionsOfTasks(int taskId, int taskId2);
+
+    /**
+     * Sets the specified task as completed.
+     *
+     * @param taskId Id of the task.
+     * @throws TaskAlreadyCompletedException Thrown if the specified task is already completed.
+     * @throws TaskDoesNotExistException Thrown if no task with the specified taskId exists.
+     * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
+     */
+    public void completeTask(int taskId);
 }

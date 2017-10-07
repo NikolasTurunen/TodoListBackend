@@ -89,4 +89,14 @@ public class TasksResource {
     public void swapPositionsOfTasks(@RequestParam("taskId") int taskId, @RequestParam("taskId2") int taskId2) {
         tasksService.swapPositionsOfTasks(taskId, taskId2);
     }
+
+    /**
+     * Sets the specified task as completed.
+     *
+     * @param taskId Id of the task.
+     */
+    @PostMapping(BASE_PATH + "/complete")
+    public void completeTask(int taskId) {
+        tasksService.completeTask(taskId);
+    }
 }

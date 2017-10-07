@@ -23,6 +23,7 @@ CREATE TABLE public.tasks
   task text NOT NULL,
   parent_task_id integer,
   "position" integer NOT NULL,
+  completed boolean NOT NULL,
   CONSTRAINT tasks_pkey PRIMARY KEY (id),
   CONSTRAINT tasks_parent_task_id_fkey FOREIGN KEY (parent_task_id)
       REFERENCES public.tasks (id) MATCH SIMPLE
@@ -36,10 +37,6 @@ WITH (
 );
 ALTER TABLE public.tasks
   OWNER TO postgres;
-
--- Index: public.fki_tasks_parent_task_id_fkey
-
--- DROP INDEX public.fki_tasks_parent_task_id_fkey;
 
 CREATE INDEX fki_tasks_parent_task_id_fkey
   ON public.tasks

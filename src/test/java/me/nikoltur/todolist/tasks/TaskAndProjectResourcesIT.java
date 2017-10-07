@@ -364,6 +364,16 @@ public class TaskAndProjectResourcesIT {
         Assert.assertEquals("Task string of second detail should be the task string of the other detail after swap", detail2.getTaskString(), details.get(1).getTaskString());
     }
 
+    @Test
+    public void testCompleteTask() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        tasksResource.completeTask(task.getId());
+
+        Task completedTask = tasksResource.getTasks(project.getId()).get(0);
+        Assert.assertTrue("Task should be completed", completedTask.isCompleted());
+    }
+
     /**
      * Creates a project with the specified name and returns the created project.
      *

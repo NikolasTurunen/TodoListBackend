@@ -657,4 +657,64 @@ public class TasksServiceTest {
             }
         }
     }
+
+    @Test
+    public void testCompleteTask() {
+        int taskId = 1;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = new Task();
+        task.setProjectId(123);
+        task.setTaskString("Task");
+        Mockito.doReturn(task).when(tasksDao).getById(taskId);
+
+        tasksService.completeTask(taskId);
+        Mockito.verify(tasksDao).save(anyObject());
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertSame("The saved task should be the task that was set as completed", task, savedTask);
+        Assert.assertTrue("The task should be set as completed", savedTask.isCompleted());
+    }
+
+    @Test
+    public void testCompleteTaskThrowsForIllegalTaskId() {
+        try {
+            tasksService.completeTask(0);
+            Assert.fail("Zero task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.completeTask(-1);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.completeTask(-354);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testCompleteTaskThrowsForNonExistingTask() {
+        int taskId = 1;
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(null);
+
+        tasksService.completeTask(taskId);
+    }
+
+    @Test(expected = TaskAlreadyCompletedException.class)
+    public void testCompleteTaskThrowsForAlreadyCompletedTask() {
+        int taskId = 1;
+
+        Task task = new Task();
+        task.setCompleted(true);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        tasksService.completeTask(taskId);
+    }
 }

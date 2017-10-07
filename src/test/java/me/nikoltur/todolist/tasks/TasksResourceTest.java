@@ -96,4 +96,13 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService, times(1)).swapPositionsOfTasks(taskId, taskId2);
     }
+
+    @Test
+    public void testCompleteTask() {
+        int taskId = 1;
+
+        tasksResource.completeTask(taskId);
+
+        Mockito.verify(tasksService).completeTask(taskId);
+    }
 }
