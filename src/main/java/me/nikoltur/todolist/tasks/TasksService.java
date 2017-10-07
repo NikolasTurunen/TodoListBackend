@@ -85,4 +85,14 @@ public interface TasksService {
      * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
      */
     public void completeTask(int taskId);
+
+    /**
+     * Sets the specified task as not completed.
+     *
+     * @param taskId Id of the task.
+     * @throws TaskNotCompletedException Thrown if the specified task is not completed.
+     * @throws TaskDoesNotExistException Thrown if no task with the specified taskId exists.
+     * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
+     */
+    public void decompleteTask(int taskId);
 }

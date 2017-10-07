@@ -99,4 +99,14 @@ public class TasksResource {
     public void completeTask(@RequestParam("taskId") int taskId) {
         tasksService.completeTask(taskId);
     }
+
+    /**
+     * Sets the specified task as not completed.
+     *
+     * @param taskId Id of the task.
+     */
+    @PostMapping(BASE_PATH + "/decomplete")
+    public void decompleteTask(@RequestParam("taskId") int taskId) {
+        tasksService.decompleteTask(taskId);
+    }
 }

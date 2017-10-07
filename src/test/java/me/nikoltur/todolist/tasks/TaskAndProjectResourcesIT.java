@@ -374,6 +374,18 @@ public class TaskAndProjectResourcesIT {
         Assert.assertTrue("Task should be completed", completedTask.isCompleted());
     }
 
+    @Test
+    public void testCompleteDecompleteTask() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task");
+        tasksResource.completeTask(task.getId());
+
+        tasksResource.decompleteTask(task.getId());
+
+        Task completedTask = tasksResource.getTasks(project.getId()).get(0);
+        Assert.assertFalse("Task should not be completed", completedTask.isCompleted());
+    }
+
     /**
      * Creates a project with the specified name and returns the created project.
      *

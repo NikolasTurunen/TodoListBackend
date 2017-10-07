@@ -105,4 +105,13 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService).completeTask(taskId);
     }
+
+    @Test
+    public void testDecompleteTask() {
+        int taskId = 1;
+
+        tasksResource.decompleteTask(taskId);
+
+        Mockito.verify(tasksService).decompleteTask(taskId);
+    }
 }

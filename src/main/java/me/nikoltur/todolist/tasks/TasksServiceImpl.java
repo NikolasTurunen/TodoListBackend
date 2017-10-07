@@ -235,6 +235,24 @@ public class TasksServiceImpl implements TasksService {
         tasksDao.save(task);
     }
 
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public synchronized void decompleteTask(int taskId) {
+        validateTaskId(taskId);
+
+        Task task = tasksDao.getById(taskId);
+        if (task == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
+        }
+
+        if (!task.isCompleted()) {
+            throw new TaskNotCompletedException("The specified task is not marked as completed");
+        }
+
+        task.setCompleted(false);
+        tasksDao.save(task);
+    }
+
     /**
      * Validates the specified taskId.
      *

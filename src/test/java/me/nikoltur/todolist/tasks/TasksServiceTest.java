@@ -718,4 +718,65 @@ public class TasksServiceTest {
 
         tasksService.completeTask(taskId);
     }
+
+    @Test
+    public void testDecompleteTask() {
+        int taskId = 1;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = new Task();
+        task.setCompleted(true);
+        task.setProjectId(123);
+        task.setTaskString("Task");
+        Mockito.doReturn(task).when(tasksDao).getById(taskId);
+
+        tasksService.decompleteTask(taskId);
+        Mockito.verify(tasksDao).save(anyObject());
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertSame("The saved task should be the task that was set as completed", task, savedTask);
+        Assert.assertFalse("The task should be set as not completed", savedTask.isCompleted());
+    }
+
+    @Test
+    public void testDecompleteTaskThrowsForIllegalTaskId() {
+        try {
+            tasksService.decompleteTask(0);
+            Assert.fail("Zero task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.decompleteTask(-1);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+
+        try {
+            tasksService.decompleteTask(-354);
+            Assert.fail("Negative task id should throw an exception");
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    @Test(expected = TaskDoesNotExistException.class)
+    public void testDecompleteTaskThrowsForNonExistingTask() {
+        int taskId = 1;
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(null);
+
+        tasksService.decompleteTask(taskId);
+    }
+
+    @Test(expected = TaskNotCompletedException.class)
+    public void testDecompleteTaskThrowsForNotCompletedTask() {
+        int taskId = 1;
+
+        Task task = new Task();
+        task.setCompleted(false);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        tasksService.decompleteTask(taskId);
+    }
 }
