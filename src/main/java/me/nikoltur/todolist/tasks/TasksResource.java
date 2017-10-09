@@ -105,8 +105,8 @@ public class TasksResource {
      *
      * @param taskId Id of the task.
      */
-    @PostMapping(BASE_PATH + "/decomplete")
-    public void decompleteTask(@RequestParam("taskId") int taskId) {
-        tasksService.decompleteTask(taskId);
+    @PostMapping(BASE_PATH + "/uncomplete")
+    public void uncompleteTask(@RequestParam("taskId") int taskId) {
+        tasksService.uncompleteTask(taskId);
     }
 }

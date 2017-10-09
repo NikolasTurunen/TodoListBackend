@@ -237,7 +237,7 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public synchronized void decompleteTask(int taskId) {
+    public synchronized void uncompleteTask(int taskId) {
         validateTaskId(taskId);
 
         Task task = tasksDao.getById(taskId);

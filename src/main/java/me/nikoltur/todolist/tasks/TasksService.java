@@ -94,5 +94,5 @@ public interface TasksService {
      * @throws TaskDoesNotExistException Thrown if no task with the specified taskId exists.
      * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
      */
-    public void decompleteTask(int taskId);
+    public void uncompleteTask(int taskId);
 }

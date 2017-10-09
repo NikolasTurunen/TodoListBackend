@@ -107,11 +107,11 @@ public class TasksResourceTest {
     }
 
     @Test
-    public void testDecompleteTask() {
+    public void testUncompleteTask() {
         int taskId = 1;
 
-        tasksResource.decompleteTask(taskId);
+        tasksResource.uncompleteTask(taskId);
 
-        Mockito.verify(tasksService).decompleteTask(taskId);
+        Mockito.verify(tasksService).uncompleteTask(taskId);
     }
 }

@@ -720,7 +720,7 @@ public class TasksServiceTest {
     }
 
     @Test
-    public void testDecompleteTask() {
+    public void testuncompleteTask() {
         int taskId = 1;
 
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
@@ -732,7 +732,7 @@ public class TasksServiceTest {
         task.setTaskString("Task");
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
 
-        tasksService.decompleteTask(taskId);
+        tasksService.uncompleteTask(taskId);
         Mockito.verify(tasksDao).save(anyObject());
 
         Task savedTask = savedTaskCaptor.getValue();
@@ -741,42 +741,42 @@ public class TasksServiceTest {
     }
 
     @Test
-    public void testDecompleteTaskThrowsForIllegalTaskId() {
+    public void testUncompleteTaskThrowsForIllegalTaskId() {
         try {
-            tasksService.decompleteTask(0);
+            tasksService.uncompleteTask(0);
             Assert.fail("Zero task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            tasksService.decompleteTask(-1);
+            tasksService.uncompleteTask(-1);
             Assert.fail("Negative task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            tasksService.decompleteTask(-354);
+            tasksService.uncompleteTask(-354);
             Assert.fail("Negative task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
     }
 
     @Test(expected = TaskDoesNotExistException.class)
-    public void testDecompleteTaskThrowsForNonExistingTask() {
+    public void testUncompleteTaskThrowsForNonExistingTask() {
         int taskId = 1;
         Mockito.when(tasksDao.getById(taskId)).thenReturn(null);
 
-        tasksService.decompleteTask(taskId);
+        tasksService.uncompleteTask(taskId);
     }
 
     @Test(expected = TaskNotCompletedException.class)
-    public void testDecompleteTaskThrowsForNotCompletedTask() {
+    public void testUncompleteTaskThrowsForNotCompletedTask() {
         int taskId = 1;
 
         Task task = new Task();
         task.setCompleted(false);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        tasksService.decompleteTask(taskId);
+        tasksService.uncompleteTask(taskId);
     }
 }

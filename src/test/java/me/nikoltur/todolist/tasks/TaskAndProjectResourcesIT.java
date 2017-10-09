@@ -375,12 +375,12 @@ public class TaskAndProjectResourcesIT {
     }
 
     @Test
-    public void testCompleteDecompleteTask() {
+    public void testCompleteUncompleteTask() {
         Project project = createProject("Project");
         Task task = createTask(project.getId(), "Task");
         tasksResource.completeTask(task.getId());
 
-        tasksResource.decompleteTask(task.getId());
+        tasksResource.uncompleteTask(task.getId());
 
         Task completedTask = tasksResource.getTasks(project.getId()).get(0);
         Assert.assertFalse("Task should not be completed", completedTask.isCompleted());
