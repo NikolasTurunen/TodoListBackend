@@ -96,11 +96,11 @@ public class TasksServiceImpl implements TasksService {
      */
     private List<Task> getTasksWith(Task task) {
         List<Task> remainingTasks;
-        if (task.getProjectId() != null) {
-            // Having project id means that the task is at the top level.
+        if (task.getParentTaskId() == null) {
+            // If parent task id is null it means that the task is at the top level.
             remainingTasks = tasksDao.getAllOf(task.getProjectId());
         } else {
-            // Otherwise the task is a task detail. Get the details of the parent task.
+            // Otherwise the task is a task detail. Get the details of the parent task to get all the details on the same level.
             remainingTasks = tasksDao.getById(task.getParentTaskId()).getDetails();
         }
 

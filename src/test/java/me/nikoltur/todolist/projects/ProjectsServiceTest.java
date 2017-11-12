@@ -32,6 +32,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @ContextConfiguration(classes = Application.class)
 public class ProjectsServiceTest {
 
+    private static final int PROJECT_ID = 1;
     @InjectMocks
     private ProjectsService projectsService = new ProjectsServiceImpl();
     @Mock
@@ -107,32 +108,30 @@ public class ProjectsServiceTest {
 
     @Test
     public void testRemoveProject() {
-        int projectId = 1;
         String projectName = "Testit";
 
         Project project = new Project();
         project.setName(projectName);
 
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).remove(argumentCaptor.capture());
 
         Mockito.doReturn(new ArrayList<>()).when(tasksDao).getAllOf(project.getId());
 
-        projectsService.removeProject(projectId);
+        projectsService.removeProject(PROJECT_ID);
         Mockito.verify(projectsDao, times(1)).remove(anyObject());
         Assert.assertEquals("Project name should be equal to the specified", projectName, argumentCaptor.getValue().getName());
     }
 
     @Test
     public void testRemoveProjectThrowsWhenProjectDoesNotExist() {
-        int projectId = 1;
-        Mockito.doReturn(null).when(projectsDao).getById(projectId);
+        Mockito.doReturn(null).when(projectsDao).getById(PROJECT_ID);
         Mockito.doNothing().when(projectsDao).remove(anyObject());
 
         try {
-            projectsService.removeProject(projectId);
+            projectsService.removeProject(PROJECT_ID);
             Assert.fail(); // Fail if no exception is caught.
         } catch (ProjectDoesNotExistException ex) {
             Assert.assertSame("Exception type should be ProjectDoesNotExistException", ProjectDoesNotExistException.class, ex.getClass());
@@ -162,37 +161,32 @@ public class ProjectsServiceTest {
 
     @Test(expected = ProjectHasTasksException.class)
     public void testRemoveProjectThrowsIfProjectHasTasks() {
-        int projectId = 1;
-
         Project project = new Project();
         project.setName("Project name");
 
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         List<Task> tasks = new ArrayList<>();
         Task task = new Task();
-        task.setProjectId(1);
-        task.setTaskString("Task string");
         tasks.add(task);
 
         Mockito.doReturn(tasks).when(tasksDao).getAllOf(anyInt());
-        projectsService.removeProject(projectId);
+        projectsService.removeProject(PROJECT_ID);
     }
 
     @Test
     public void testRenameProject() {
-        int projectId = 1;
         String newProjectName = "New Project name";
 
         Project project = new Project();
         project.setName("Project");
 
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
 
-        projectsService.renameProject(projectId, newProjectName);
+        projectsService.renameProject(PROJECT_ID, newProjectName);
 
         Mockito.verify(projectsDao, times(1)).save(anyObject());
         Assert.assertSame("Saved project should be the same as specified", project, argumentCaptor.getValue());
@@ -201,7 +195,6 @@ public class ProjectsServiceTest {
 
     @Test(expected = NullPointerException.class)
     public void testRenameProjectThrowsForNullName() {
-
         Project project = new Project();
         project.setName("Project");
 
@@ -232,43 +225,39 @@ public class ProjectsServiceTest {
 
     @Test(expected = ProjectDoesNotExistException.class)
     public void testRenameProjectThrowsWhenProjectDoesNotExist() {
-        int projectId = 1;
+        Mockito.doReturn(null).when(projectsDao).getById(PROJECT_ID);
 
-        Mockito.doReturn(null).when(projectsDao).getById(projectId);
-
-        projectsService.renameProject(projectId, "New name");
+        projectsService.renameProject(PROJECT_ID, "New name");
     }
 
     @Test(expected = ProjectAlreadyExistsException.class)
     public void testRenameProjectThrowsWhenProjectAlreadyExists() {
-        int projectId = 1;
         String newProjectName = "New Project";
 
         Project project = new Project();
         project.setName("Project");
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         Project alreadyExistingProject = new Project();
         alreadyExistingProject.setName(newProjectName);
         Mockito.doReturn(alreadyExistingProject).when(projectsDao).getByName(newProjectName);
 
-        projectsService.renameProject(projectId, newProjectName);
+        projectsService.renameProject(PROJECT_ID, newProjectName);
     }
 
     @Test
     public void testRenameProjectDoesNotThrowWhenNewProjectNameIsTheCurrentName() {
-        int projectId = 1;
         String projectName = "Project";
 
         Project project = new Project();
         project.setName(projectName);
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         Project alreadyExistingProject = new Project();
         alreadyExistingProject.setName(projectName);
         Mockito.doReturn(alreadyExistingProject).when(projectsDao).getByName(projectName);
 
-        projectsService.renameProject(projectId, projectName);
+        projectsService.renameProject(PROJECT_ID, projectName);
     }
 
     @Test
@@ -276,7 +265,6 @@ public class ProjectsServiceTest {
         int position1 = 1;
         int position2 = 2;
 
-        int projectId1 = 1;
         int projectId2 = 2;
 
         Project project1 = new Project();
@@ -287,13 +275,13 @@ public class ProjectsServiceTest {
         project2.setName("Project2");
         project2.setPosition(position2);
 
-        Mockito.doReturn(project1).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(project1).when(projectsDao).getById(PROJECT_ID);
         Mockito.doReturn(project2).when(projectsDao).getById(projectId2);
 
         ArgumentCaptor<Project> argumentCaptor = ArgumentCaptor.forClass(Project.class);
         Mockito.doNothing().when(projectsDao).save(argumentCaptor.capture());
 
-        projectsService.swapPositionsOfProjects(projectId1, projectId2);
+        projectsService.swapPositionsOfProjects(PROJECT_ID, projectId2);
 
         Mockito.verify(projectsDao, times(2)).save(anyObject());
         List<Project> capturedArguments = argumentCaptor.getAllValues();
@@ -354,30 +342,29 @@ public class ProjectsServiceTest {
 
     @Test
     public void testSwapPositionOfProjectsThrowsForNonExistingProject() {
-        int projectId1 = 1;
         int projectId2 = 2;
 
         Project project = new Project();
         project.setName("Name");
-        Mockito.doReturn(project).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
         Mockito.doReturn(null).when(projectsDao).getById(projectId2);
 
         try {
-            projectsService.swapPositionsOfProjects(projectId1, projectId2);
+            projectsService.swapPositionsOfProjects(PROJECT_ID, projectId2);
             Assert.fail("Should throw ProjectDoesNotExistException if first project does not exist");
         } catch (ProjectDoesNotExistException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects(projectId2, projectId1);
+            projectsService.swapPositionsOfProjects(projectId2, PROJECT_ID);
             Assert.fail("Should throw ProjectDoesNotExistException if second project does not exist");
         } catch (ProjectDoesNotExistException ex) {
         }
 
-        Mockito.doReturn(null).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(null).when(projectsDao).getById(PROJECT_ID);
 
         try {
-            projectsService.swapPositionsOfProjects(projectId1, projectId2);
+            projectsService.swapPositionsOfProjects(PROJECT_ID, projectId2);
             Assert.fail("Should throw ProjectDoesNotExistException if neither project does not exist");
         } catch (ProjectDoesNotExistException ex) {
         }
@@ -385,7 +372,6 @@ public class ProjectsServiceTest {
 
     @Test
     public void testSwapPositionsOfProjectsThrowsForOtherThanPreviousOrNext() {
-        int projectId1 = 1;
         int projectId2 = 2;
 
         Project project1 = new Project();
@@ -394,17 +380,17 @@ public class ProjectsServiceTest {
         Project project2 = new Project();
         project2.setPosition(3);
 
-        Mockito.doReturn(project1).when(projectsDao).getById(projectId1);
+        Mockito.doReturn(project1).when(projectsDao).getById(PROJECT_ID);
         Mockito.doReturn(project2).when(projectsDao).getById(projectId2);
 
         try {
-            projectsService.swapPositionsOfProjects(projectId1, projectId2);
+            projectsService.swapPositionsOfProjects(PROJECT_ID, projectId2);
             Assert.fail("Should throw IllegalArgumentException if project2 is not previous or next from project1");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            projectsService.swapPositionsOfProjects(projectId2, projectId1);
+            projectsService.swapPositionsOfProjects(projectId2, PROJECT_ID);
             Assert.fail("Should throw IllegalArgumentException if project1 is not previous or next from project2");
         } catch (IllegalArgumentException ex) {
         }
@@ -485,15 +471,14 @@ public class ProjectsServiceTest {
 
     @Test
     public void testRemoveProjectThatIsLastDoesNotSaveAnything() {
-        int projectId = 1;
         Project project = new Project();
         project.setName("Name");
 
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         Mockito.doReturn(new ArrayList<>()).when(projectsDao).getAll();
 
-        projectsService.removeProject(projectId);
+        projectsService.removeProject(PROJECT_ID);
 
         Mockito.verify(projectsDao, times(0)).save(anyObject());
     }

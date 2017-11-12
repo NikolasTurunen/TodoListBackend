@@ -53,7 +53,7 @@ public class TaskAndProjectResourcesIT {
 
         Task task = tasks.get(0);
         Assert.assertEquals("Id of the single task should be 1", 1, task.getId());
-        Assert.assertEquals("Project id of the single task should match the created task", project.getId(), (int) task.getProjectId());
+        Assert.assertEquals("Project id of the single task should match the created task", (Integer) project.getId(), task.getProjectId());
         Assert.assertEquals("Task string of the single task should match the created task", taskString, task.getTaskString());
     }
 

@@ -16,6 +16,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
 
@@ -25,6 +26,7 @@ import org.mockito.MockitoAnnotations;
  */
 public class TasksServiceTest {
 
+    private static final int PROJECT_ID = 1;
     @InjectMocks
     private TasksService tasksService = new TasksServiceImpl();
     @Mock
@@ -39,18 +41,17 @@ public class TasksServiceTest {
 
     @Test
     public void testGetTasks() {
-        int projectId = 1;
         String taskString = "Do this and do that";
 
         List<Task> tasks = new ArrayList<>();
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
         task.setTaskString(taskString);
         tasks.add(task);
 
         Project project = new Project();
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
-        Mockito.doReturn(tasks).when(tasksDao).getAllOf(projectId);
+        Mockito.doReturn(tasks).when(tasksDao).getAllOf(PROJECT_ID);
 
         Assert.assertEquals("Size should be 1", 1, tasksService.getTasks(1).size());
         Assert.assertEquals("Task string should match", taskString, tasksService.getTasks(1).get(0).getTaskString());
@@ -58,11 +59,9 @@ public class TasksServiceTest {
 
     @Test(expected = ProjectDoesNotExistException.class)
     public void testGetTasksThrowsForNonExistingProject() {
-        int projectId = 1;
+        Mockito.doReturn(null).when(tasksDao).getAllOf(PROJECT_ID);
 
-        Mockito.doReturn(null).when(tasksDao).getAllOf(projectId);
-
-        tasksService.getTasks(projectId);
+        tasksService.getTasks(PROJECT_ID);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -91,18 +90,17 @@ public class TasksServiceTest {
 
     @Test
     public void testCreateTask() {
-        Integer projectId = 1;
         String taskString = "Hello world";
 
         ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
 
         Project project = new Project();
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
-        tasksService.createTask(projectId, taskString);
+        tasksService.createTask(PROJECT_ID, taskString);
 
-        Assert.assertEquals("Saved task should have the specified id", projectId, argumentCaptor.getValue().getProjectId());
+        Assert.assertEquals("Saved task should have the specified id", PROJECT_ID, (int) argumentCaptor.getValue().getProjectId());
         Assert.assertEquals("Saved task should have the specified task string", taskString, argumentCaptor.getValue().getTaskString());
         Assert.assertNull("Parent task id of the saved task should be set to null", argumentCaptor.getValue().getParentTaskId());
         Assert.assertFalse("Completion of the saved task should be false", argumentCaptor.getValue().isCompleted());
@@ -133,10 +131,9 @@ public class TasksServiceTest {
 
     @Test(expected = NullPointerException.class)
     public void testCreateTaskThrowsForNullTask() {
-        int projectId = 1;
         String taskString = null;
 
-        tasksService.createTask(projectId, taskString);
+        tasksService.createTask(PROJECT_ID, taskString);
     }
 
     @Test(expected = ProjectDoesNotExistException.class)
@@ -153,8 +150,7 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).remove(argumentCaptor.capture());
 
-        Task task = new Task();
-        task.setProjectId(123);
+        Task task = createTask(PROJECT_ID);
         task.setTaskString("Do this and that");
 
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
@@ -202,8 +198,7 @@ public class TasksServiceTest {
         int taskId = 1;
         String newTask = "Do this now!";
 
-        Task task = new Task();
-        task.setProjectId(1);
+        Task task = createTask(PROJECT_ID);
         task.setTaskString("Test task");
 
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
@@ -245,7 +240,7 @@ public class TasksServiceTest {
     public void testEditTaskThrowsForNullNewTask() {
         int taskId = 1;
 
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
         task.setTaskString("Do that");
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
 
@@ -325,10 +320,10 @@ public class TasksServiceTest {
         int taskId = 1;
         int taskId2 = 2;
 
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
         task.setPosition(positionOfTask);
 
-        Task task2 = new Task();
+        Task task2 = createTask(PROJECT_ID);
         task2.setPosition(positionOfTask2);
 
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
@@ -385,7 +380,7 @@ public class TasksServiceTest {
         int taskId = 1;
         int taskId2 = 2;
 
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
 
         Mockito.doReturn(null).when(tasksDao).getById(taskId);
         Mockito.doReturn(task).when(tasksDao).getById(taskId2);
@@ -414,17 +409,13 @@ public class TasksServiceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testSwapPositionsOfTasksThrowsForTasksOfDifferentProjects() {
-        int projectId = 1;
         int projectId2 = 2;
 
         int taskId = 1;
         int taskId2 = 2;
 
-        Task task = new Task();
-        task.setProjectId(projectId);
-
-        Task task2 = new Task();
-        task2.setProjectId(projectId2);
+        Task task = createTask(PROJECT_ID);
+        Task task2 = createTask(projectId2);
 
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
         Mockito.doReturn(task2).when(tasksDao).getById(taskId2);
@@ -440,12 +431,10 @@ public class TasksServiceTest {
         int taskId = 1;
         int taskId2 = 2;
 
-        Task task = new Task();
-        task.setProjectId(null);
+        Task task = createTask(PROJECT_ID);
         task.setParentTaskId(parentTaskId);
 
-        Task task2 = new Task();
-        task2.setProjectId(null);
+        Task task2 = createTask(PROJECT_ID);
         task2.setParentTaskId(parentTaskId2);
 
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
@@ -459,11 +448,9 @@ public class TasksServiceTest {
         int taskId = 1;
         int taskId2 = 2;
 
-        Task task = new Task();
-        task.setProjectId(5);
-
-        Task task2 = new Task();
-        task2.setProjectId(null);
+        Task task = createTask(PROJECT_ID);
+        task.setParentTaskId(null);
+        Task task2 = createTask(PROJECT_ID);
         task2.setParentTaskId(10);
 
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
@@ -477,10 +464,10 @@ public class TasksServiceTest {
         int taskId1 = 1;
         int taskId2 = 2;
 
-        Task task1 = new Task();
+        Task task1 = createTask(PROJECT_ID);
         task1.setPosition(1);
 
-        Task task2 = new Task();
+        Task task2 = createTask(PROJECT_ID);
         task2.setPosition(3);
 
         Mockito.doReturn(task1).when(tasksDao).getById(taskId1);
@@ -503,31 +490,29 @@ public class TasksServiceTest {
     public void testCreateTaskSetsCorrectPosition() {
         String projectName = "Name";
         String taskString = "Task";
-        int projectId = 1;
 
         Project project = new Project();
         project.setName(projectName);
-        project.setPosition(0);
 
-        Mockito.doReturn(project).when(projectsDao).getById(projectId);
+        Mockito.doReturn(project).when(projectsDao).getById(PROJECT_ID);
 
         ArgumentCaptor<Task> argumentCaptorForFirstTask = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(argumentCaptorForFirstTask.capture());
 
-        Mockito.doReturn(new ArrayList<>()).when(tasksDao).getAllOf(projectId);
+        Mockito.doReturn(new ArrayList<>()).when(tasksDao).getAllOf(PROJECT_ID);
 
-        tasksService.createTask(projectId, taskString);
+        tasksService.createTask(PROJECT_ID, taskString);
         Assert.assertEquals("Position of the created task should be set to 0", 0, argumentCaptorForFirstTask.getValue().getPosition());
 
         ArgumentCaptor<Task> argumentCaptorForSecondTask = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(argumentCaptorForSecondTask.capture());
 
         List<Task> tasks = new ArrayList<>();
-        tasks.add(new Task());
+        tasks.add(createTask(PROJECT_ID));
 
-        Mockito.doReturn(tasks).when(tasksDao).getAllOf(projectId);
+        Mockito.doReturn(tasks).when(tasksDao).getAllOf(PROJECT_ID);
 
-        tasksService.createTask(projectId, taskString);
+        tasksService.createTask(PROJECT_ID, taskString);
         Assert.assertEquals("Position of the created task should be set to 1", 1, argumentCaptorForSecondTask.getValue().getPosition());
     }
 
@@ -535,7 +520,7 @@ public class TasksServiceTest {
     public void testCreateDetailSetsCorrectPosition() {
         int parentTaskId = 1;
 
-        Task parentTask = Mockito.spy(new Task());
+        Task parentTask = mock(Task.class);
         Mockito.doReturn(parentTask).when(tasksDao).getById(parentTaskId);
 
         Mockito.when(parentTask.getDetails()).thenReturn(new ArrayList<>());
@@ -548,8 +533,7 @@ public class TasksServiceTest {
         Assert.assertEquals("Position of the created detail should be set to 0", 0, argumentCaptorForFirstDetail.getValue().getPosition());
 
         List<Task> details = new ArrayList<>();
-        details.add(new Task());
-
+        details.add(createTask(PROJECT_ID));
         Mockito.when(parentTask.getDetails()).thenReturn(details);
 
         ArgumentCaptor<Task> argumentCaptorForSecondDetail = ArgumentCaptor.forClass(Task.class);
@@ -562,31 +546,23 @@ public class TasksServiceTest {
 
     @Test
     public void testRemoveTaskDecrementsPositionsOfTasksWithHigherPosition() {
-        int projectId = 1;
         int taskId = 1;
 
-        int task3Position = 2;
-        int task4Position = 3;
-
-        Task taskToRemove = new Task();
-        taskToRemove.setProjectId(projectId);
+        Task taskToRemove = createTask(PROJECT_ID);
         taskToRemove.setPosition(1);
 
         List<Task> tasks = new ArrayList<>();
-        Task task1 = new Task();
-        task1.setProjectId(projectId);
+        Task task1 = createTask(PROJECT_ID);
         task1.setPosition(0);
         tasks.add(task1);
-        Task task3 = new Task();
-        task3.setProjectId(projectId);
-        task3.setPosition(task3Position);
+        Task task3 = createTask(PROJECT_ID);
+        task3.setPosition(2);
         tasks.add(task3);
-        Task task4 = new Task();
-        task4.setProjectId(projectId);
-        task4.setPosition(task4Position);
+        Task task4 = createTask(PROJECT_ID);
+        task4.setPosition(3);
         tasks.add(task4);
 
-        Mockito.doReturn(tasks).when(tasksDao).getAllOf(projectId);
+        Mockito.doReturn(tasks).when(tasksDao).getAllOf(PROJECT_ID);
 
         Mockito.doReturn(taskToRemove).when(tasksDao).getById(taskId);
 
@@ -616,22 +592,22 @@ public class TasksServiceTest {
         int detail3Position = 2;
         int detail4Position = 3;
 
-        Task parentTask = Mockito.spy(new Task());
+        Task parentTask = mock(Task.class);
 
-        Task detailToRemove = new Task();
+        Task detailToRemove = createTask(PROJECT_ID);
         detailToRemove.setParentTaskId(parentTaskId);
         detailToRemove.setPosition(1);
 
         List<Task> details = new ArrayList<>();
-        Task detail1 = new Task();
+        Task detail1 = createTask(PROJECT_ID);
         detail1.setParentTaskId(parentTaskId);
         detail1.setPosition(0);
         details.add(detail1);
-        Task detail3 = new Task();
+        Task detail3 = createTask(PROJECT_ID);
         detail3.setParentTaskId(parentTaskId);
         detail3.setPosition(detail3Position);
         details.add(detail3);
-        Task detail4 = new Task();
+        Task detail4 = createTask(PROJECT_ID);
         detail4.setParentTaskId(parentTaskId);
         detail4.setPosition(detail4Position);
         details.add(detail4);
@@ -666,8 +642,7 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task task = new Task();
-        task.setProjectId(123);
+        Task task = createTask(PROJECT_ID);
         task.setTaskString("Task");
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
 
@@ -712,7 +687,7 @@ public class TasksServiceTest {
     public void testCompleteTaskThrowsForAlreadyCompletedTask() {
         int taskId = 1;
 
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
         task.setCompleted(true);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
@@ -726,9 +701,8 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
         task.setCompleted(true);
-        task.setProjectId(123);
         task.setTaskString("Task");
         Mockito.doReturn(task).when(tasksDao).getById(taskId);
 
@@ -773,10 +747,23 @@ public class TasksServiceTest {
     public void testUncompleteTaskThrowsForNotCompletedTask() {
         int taskId = 1;
 
-        Task task = new Task();
+        Task task = createTask(PROJECT_ID);
         task.setCompleted(false);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
         tasksService.uncompleteTask(taskId);
+    }
+
+    /**
+     * Creates a new task with the specified projectId.
+     *
+     * @param projectId Project id for the task.
+     * @return The created task.
+     */
+    private Task createTask(int projectId) {
+        Task task = new Task();
+        task.setProjectId(projectId);
+
+        return task;
     }
 }
