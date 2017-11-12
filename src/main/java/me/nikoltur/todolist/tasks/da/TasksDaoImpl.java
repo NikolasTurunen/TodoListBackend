@@ -22,7 +22,7 @@ public class TasksDaoImpl implements TasksDao {
     @Override
     public List<Task> getAllOf(int projectId) {
         Session session = sessionFactory.getCurrentSession();
-        TypedQuery<Task> query = session.createQuery("from Task t where t.projectId=:projectId order by t.position");
+        TypedQuery<Task> query = session.createQuery("from Task t where t.projectId=:projectId and t.parentTaskId is null order by t.position");
         query.setParameter("projectId", projectId);
 
         return query.getResultList();

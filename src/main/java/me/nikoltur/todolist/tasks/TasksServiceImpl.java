@@ -152,6 +152,7 @@ public class TasksServiceImpl implements TasksService {
         int position = parentTask.getDetails().size();
 
         Task task = new Task();
+        task.setProjectId(parentTask.getProjectId());
         task.setParentTaskId(taskId);
         task.setTaskString(detail);
         task.setPosition(position);
@@ -189,10 +190,6 @@ public class TasksServiceImpl implements TasksService {
         Task task2 = tasksDao.getById(taskId2);
         if (task2 == null) {
             throw new TaskDoesNotExistException("No task with id " + taskId2 + " exists");
-        }
-
-        if ((task1.getProjectId() == null && task2.getProjectId() != null) || (task1.getParentTaskId() == null && task2.getParentTaskId() != null)) {
-            throw new IllegalArgumentException("The specified tasks must both be either tasks or details of tasks, not mixed");
         }
 
         if (!Objects.equals(task1.getProjectId(), task2.getProjectId())) {

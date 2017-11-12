@@ -264,14 +264,15 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> argumentCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(argumentCaptor.capture());
 
-        Task task = Mockito.mock(Task.class);
-        Mockito.doReturn(task).when(tasksDao).getById(parentTaskId);
+        Task parentTask = mock(Task.class);
+        Mockito.when(parentTask.getProjectId()).thenReturn(PROJECT_ID);
+        Mockito.doReturn(parentTask).when(tasksDao).getById(parentTaskId);
 
         tasksService.createDetail(parentTaskId, detailString);
 
         Mockito.verify(tasksDao, times(1)).save(anyObject());
         Assert.assertEquals("Parent task id of the saved task should be the specified task id", parentTaskId, argumentCaptor.getValue().getParentTaskId());
-        Assert.assertNull("Project id of the saved task should be null", argumentCaptor.getValue().getProjectId());
+        Assert.assertEquals("Project id of the saved task should be the project id of the parent task", (Integer) PROJECT_ID, argumentCaptor.getValue().getProjectId());
         Assert.assertEquals("Detail of the saved task should be the specified detail", detailString, argumentCaptor.getValue().getTaskString());
     }
 

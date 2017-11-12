@@ -26,7 +26,7 @@ public class Task implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
-    @Column(name = "project_id")
+    @Column(name = "project_id", nullable = false)
     private Integer projectId;
     @Column(name = "task", nullable = false)
     private String taskString;

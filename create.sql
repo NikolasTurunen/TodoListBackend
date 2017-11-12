@@ -19,7 +19,7 @@ ALTER TABLE public.projects
 CREATE TABLE public.tasks
 (
   id serial NOT NULL,
-  project_id integer,
+  project_id integer NOT NULL,
   task text NOT NULL,
   parent_task_id integer,
   "position" integer NOT NULL,
