@@ -95,4 +95,16 @@ public interface TasksService {
      * @throws IllegalArgumentException Thrown if the specified taskId is negative or zero.
      */
     public void uncompleteTask(int taskId);
+
+    /**
+     * Moves the source task to be a detail of the destination task.
+     *
+     * @param sourceId Id of the source task.
+     * @param destinationId Id of the destination task.
+     * @throws TaskDoesNotExistException Thrown if the specified source or destination task does not exist.
+     * @throws IllegalArgumentException Thrown if the specified sourceId or destinationId is negative or zero.
+     * Or if the source id is equal to destinationId.
+     * Or if the parent task id of the source task is equal to destinationId.
+     */
+    public void moveTask(int sourceId, int destinationId);
 }

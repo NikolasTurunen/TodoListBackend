@@ -250,6 +250,37 @@ public class TasksServiceImpl implements TasksService {
         tasksDao.save(task);
     }
 
+    @Override
+    public void moveTask(int sourceId, int destinationId) {
+        validateTaskId(sourceId);
+        validateTaskId(destinationId);
+
+        if (sourceId == destinationId) {
+            throw new IllegalArgumentException("Cannot move task to be a detail of itself");
+        }
+
+        Task sourceTask = tasksDao.getById(sourceId);
+        if (sourceTask == null) {
+            throw new TaskDoesNotExistException("No task with id " + sourceId + " exists");
+        }
+        Task destinationTask = tasksDao.getById(destinationId);
+        if (destinationTask == null) {
+            throw new TaskDoesNotExistException("No task with id " + destinationId + " exists");
+        }
+
+        if (sourceTask.getParentTaskId() == destinationId) {
+            throw new IllegalArgumentException("Task is already a detail of destination");
+        }
+
+        decrementPositionsOfTasksWithHigherPosition(sourceTask.getPosition(), tasksDao.getById(sourceTask.getParentTaskId()).getDetails());
+
+        sourceTask.setParentTaskId(destinationId);
+        sourceTask.setProjectId(destinationTask.getProjectId());
+        sourceTask.setPosition(destinationTask.getDetails().size());
+
+        tasksDao.save(sourceTask);
+    }
+
     /**
      * Validates the specified taskId.
      *
