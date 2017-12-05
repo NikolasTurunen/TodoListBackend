@@ -251,34 +251,34 @@ public class TasksServiceImpl implements TasksService {
     }
 
     @Override
-    public void moveTask(int sourceId, int destinationId) {
-        validateTaskId(sourceId);
-        validateTaskId(destinationId);
+    public void moveTask(int taskId, int newParentTaskId) {
+        validateTaskId(taskId);
+        validateTaskId(newParentTaskId);
 
-        if (sourceId == destinationId) {
+        if (taskId == newParentTaskId) {
             throw new IllegalArgumentException("Cannot move task to be a detail of itself");
         }
 
-        Task sourceTask = tasksDao.getById(sourceId);
-        if (sourceTask == null) {
-            throw new TaskDoesNotExistException("No task with id " + sourceId + " exists");
+        Task task = tasksDao.getById(taskId);
+        if (task == null) {
+            throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
         }
-        Task destinationTask = tasksDao.getById(destinationId);
-        if (destinationTask == null) {
-            throw new TaskDoesNotExistException("No task with id " + destinationId + " exists");
+        Task newParentTask = tasksDao.getById(newParentTaskId);
+        if (newParentTask == null) {
+            throw new TaskDoesNotExistException("No task with id " + newParentTaskId + " exists");
         }
 
-        if (sourceTask.getParentTaskId() == destinationId) {
+        if (task.getParentTaskId() == newParentTaskId) {
             throw new IllegalArgumentException("Task is already a detail of destination");
         }
 
-        decrementPositionsOfTasksWithHigherPosition(sourceTask.getPosition(), tasksDao.getById(sourceTask.getParentTaskId()).getDetails());
+        decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getById(task.getParentTaskId()).getDetails());
 
-        sourceTask.setParentTaskId(destinationId);
-        sourceTask.setProjectId(destinationTask.getProjectId());
-        sourceTask.setPosition(destinationTask.getDetails().size());
+        task.setParentTaskId(newParentTaskId);
+        task.setProjectId(newParentTask.getProjectId());
+        task.setPosition(newParentTask.getDetails().size());
 
-        tasksDao.save(sourceTask);
+        tasksDao.save(task);
     }
 
     /**
