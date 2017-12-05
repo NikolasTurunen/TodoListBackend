@@ -21,68 +21,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -968,6 +906,32 @@ public class TasksServiceTest {
                 Assert.assertEquals("Position of task 3 should be updated to 2", 2, savedTask.getPosition());
             }
         }
+    }
+
+    @Test
+    public void testMoveTaskWorksIfCurrentParentTaskIsNull() {
+        int taskId = 1;
+        int newParentTaskId = 2;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Integer currentParentTaskId = null;
+
+        Task task = createTask(PROJECT_ID);
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
+
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        tasksService.moveTask(taskId, newParentTaskId);
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertSame("The moved task should be saved", task, savedTask);
+        Assert.assertEquals("Parent task id of the saved task should be updated to the new parent task id", newParentTaskId, (int) savedTask.getParentTaskId());
     }
 
     @Test(expected = IllegalArgumentException.class)

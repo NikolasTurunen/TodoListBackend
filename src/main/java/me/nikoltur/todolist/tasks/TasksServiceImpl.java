@@ -268,11 +268,13 @@ public class TasksServiceImpl implements TasksService {
             throw new TaskDoesNotExistException("No task with id " + newParentTaskId + " exists");
         }
 
-        if (task.getParentTaskId() == newParentTaskId) {
-            throw new IllegalArgumentException("Task is already a detail of destination");
-        }
+        if (task.getParentTaskId() != null) {
+            if (task.getParentTaskId() == newParentTaskId) {
+                throw new IllegalArgumentException("Task is already a detail of destination");
+            }
 
-        decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getById(task.getParentTaskId()).getDetails());
+            decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getById(task.getParentTaskId()).getDetails());
+        }
 
         task.setParentTaskId(newParentTaskId);
         task.setProjectId(newParentTask.getProjectId());
