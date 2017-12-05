@@ -21,6 +21,68 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.mock;
 
 /**
  *
@@ -759,157 +821,157 @@ public class TasksServiceTest {
 
     @Test
     public void testMoveTask() {
-        int sourceId = 1;
-        int destinationId = 2;
+        int taskId = 1;
+        int newParentTaskId = 2;
 
-        int parentTaskIdOfSource = 3;
+        int currentParentTaskId = 3;
 
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task sourceTask = createTask(PROJECT_ID);
-        sourceTask.setParentTaskId(parentTaskIdOfSource);
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(sourceTask);
+        Task task = createTask(PROJECT_ID);
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        Task destinationTask = spy(createTask(PROJECT_ID));
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(destinationTask);
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        Mockito.when(destinationTask.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        Task parentTaskOfSource = mock(Task.class);
-        Mockito.when(tasksDao.getById(parentTaskIdOfSource)).thenReturn(parentTaskOfSource);
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
 
-        Mockito.when(parentTaskOfSource.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
 
         Task savedTask = savedTaskCaptor.getValue();
-        Assert.assertSame("The moved task should be saved", sourceTask, savedTask);
-        Assert.assertEquals("Parent task id of the saved task should be updated to the destination", destinationId, (int) savedTask.getParentTaskId());
+        Assert.assertSame("The moved task should be saved", task, savedTask);
+        Assert.assertEquals("Parent task id of the saved task should be updated to the new parent task id", newParentTaskId, (int) savedTask.getParentTaskId());
     }
 
     @Test
     public void testMoveTaskToDifferentProjectUpdatesProjectId() {
         int projectId2 = 2;
 
-        int sourceId = 1;
-        int destinationId = 2;
+        int taskId = 1;
+        int newParentTaskId = 2;
 
-        int parentTaskIdOfSource = 3;
+        int currentParentTaskId = 3;
 
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task sourceTask = createTask(PROJECT_ID);
-        sourceTask.setParentTaskId(parentTaskIdOfSource);
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(sourceTask);
+        Task task = createTask(PROJECT_ID);
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        Task destinationTask = spy(createTask(projectId2));
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(destinationTask);
+        Task newParentTask = spy(createTask(projectId2));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        Mockito.when(destinationTask.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        Task parentTaskOfSource = mock(Task.class);
-        Mockito.when(tasksDao.getById(parentTaskIdOfSource)).thenReturn(parentTaskOfSource);
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
 
-        Mockito.when(parentTaskOfSource.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
 
         Task savedTask = savedTaskCaptor.getValue();
-        Assert.assertSame("The moved task should be saved", sourceTask, savedTask);
-        Assert.assertEquals("Project id of the saved task should be updated to the project id of the destination", projectId2, (int) savedTask.getProjectId());
+        Assert.assertSame("The moved task should be saved", task, savedTask);
+        Assert.assertEquals("Project id of the saved task should be updated to the project id of the new parent task", projectId2, (int) savedTask.getProjectId());
     }
 
     @Test
     public void testMoveTaskUpdatesPositionToLast() {
-        int sourceId = 1;
-        int destinationId = 2;
+        int taskId = 1;
+        int newParentTaskId = 2;
 
-        int parentTaskIdOfSource = 3;
+        int currentParentTaskId = 3;
 
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task sourceTask = createTask(PROJECT_ID);
-        sourceTask.setParentTaskId(parentTaskIdOfSource);
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(sourceTask);
-        Task destinationTask = spy(createTask(PROJECT_ID));
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(destinationTask);
+        Task task = createTask(PROJECT_ID);
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
         List<Task> detailsOfDestinationTask = new ArrayList<>();
         detailsOfDestinationTask.add(createTask(PROJECT_ID));
         detailsOfDestinationTask.add(createTask(PROJECT_ID));
         detailsOfDestinationTask.add(createTask(PROJECT_ID));
-        Mockito.when(destinationTask.getDetails()).thenReturn(detailsOfDestinationTask);
+        Mockito.when(newParentTask.getDetails()).thenReturn(detailsOfDestinationTask);
 
-        Task parentTaskOfSource = mock(Task.class);
-        Mockito.when(tasksDao.getById(parentTaskIdOfSource)).thenReturn(parentTaskOfSource);
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
 
-        Mockito.when(parentTaskOfSource.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
 
         int expectedPosition = detailsOfDestinationTask.size();
 
         Task savedTask = savedTaskCaptor.getValue();
-        Assert.assertSame("The moved task should be saved", sourceTask, savedTask);
+        Assert.assertSame("The moved task should be saved", task, savedTask);
         Assert.assertEquals("Position of the saved task should be updated to be the last", expectedPosition, savedTask.getPosition());
     }
 
     @Test
-    public void testMoveTaskUpdatesPositionsOfTasksWithHigherPositionAtSourceLocation() {
-        int sourceId = 1;
-        int destinationId = 2;
+    public void testMoveTaskUpdatesPositionsOfTasksWithHigherPositionAtOldLocation() {
+        int taskId = 1;
+        int newParentTaskId = 2;
 
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        int parentTaskIdOfSource = 3;
+        int currentParentTaskId = 3;
 
-        Task sourceTask = createTask(PROJECT_ID);
-        sourceTask.setPosition(1);
-        sourceTask.setParentTaskId(parentTaskIdOfSource);
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(sourceTask);
+        Task task = createTask(PROJECT_ID);
+        task.setPosition(1);
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        Task destinationTask = spy(createTask(PROJECT_ID));
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(destinationTask);
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        Mockito.when(destinationTask.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        Task parentTaskOfSource = mock(Task.class);
-        Mockito.when(tasksDao.getById(parentTaskIdOfSource)).thenReturn(parentTaskOfSource);
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
 
         List<Task> detailsOfParentTaskOfSource = new ArrayList<>();
         Task task1 = createTask(PROJECT_ID);
         task1.setPosition(0);
         detailsOfParentTaskOfSource.add(task1);
-        detailsOfParentTaskOfSource.add(sourceTask);
+        detailsOfParentTaskOfSource.add(task);
         Task task2 = createTask(PROJECT_ID);
         task2.setPosition(2);
         detailsOfParentTaskOfSource.add(task2);
         Task task3 = createTask(PROJECT_ID);
         task3.setPosition(3);
         detailsOfParentTaskOfSource.add(task3);
-        Mockito.when(parentTaskOfSource.getDetails()).thenReturn(detailsOfParentTaskOfSource);
+        Mockito.when(currentParentTask.getDetails()).thenReturn(detailsOfParentTaskOfSource);
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
 
         Assert.assertFalse("Task 1 should not be saved", savedTaskCaptor.getAllValues().contains(task1));
         Assert.assertTrue("Task 2 should be saved", savedTaskCaptor.getAllValues().contains(task2));
         Assert.assertTrue("Task 3 should be saved", savedTaskCaptor.getAllValues().contains(task3));
 
-        for (Task task : savedTaskCaptor.getAllValues()) {
-            if (task == task2) {
-                Assert.assertEquals("Position of task 2 should be updated to 1", 1, task.getPosition());
-            } else if (task == task3) {
-                Assert.assertEquals("Position of task 3 should be updated to 2", 2, task.getPosition());
+        for (Task savedTask : savedTaskCaptor.getAllValues()) {
+            if (savedTask == task2) {
+                Assert.assertEquals("Position of task 2 should be updated to 1", 1, savedTask.getPosition());
+            } else if (savedTask == task3) {
+                Assert.assertEquals("Position of task 3 should be updated to 2", 2, savedTask.getPosition());
             }
         }
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMoveTaskThrowsWhenSourceAndDestinationAreEqual() {
+    public void testMoveTaskThrowsWhenTaskIdAndNewParentTaskIdAreEqual() {
         int taskId = 1;
 
         Task task = createTask(PROJECT_ID);
@@ -919,48 +981,48 @@ public class TasksServiceTest {
     }
 
     @Test(expected = TaskDoesNotExistException.class)
-    public void testMoveTaskThrowsWhenSourceDoesNotExist() {
-        int sourceId = 1;
-        int destinationId = 2;
+    public void testMoveTaskThrowsWhenTaskDoesNotExist() {
+        int taskId = 1;
+        int newParentTaskId = 2;
 
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(null);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(null);
 
-        Task destinationTask = createTask(PROJECT_ID);
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(destinationTask);
+        Task newParentTask = createTask(PROJECT_ID);
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
     }
 
     @Test(expected = TaskDoesNotExistException.class)
-    public void testMoveTaskThrowsWhenDestinationDoesNotExist() {
-        int sourceId = 1;
-        int destinationId = 2;
+    public void testMoveTaskThrowsWhenNewParentTaskDoesNotExist() {
+        int taskId = 1;
+        int newParentTaskId = 2;
 
-        Task sourceTask = createTask(PROJECT_ID);
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(sourceTask);
+        Task task = createTask(PROJECT_ID);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(null);
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(null);
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMoveTaskThrowsWhenSourceIsAlreadyDetailOfDestinationTask() {
-        int sourceId = 1;
-        int destinationId = 2;
+    public void testMoveTaskThrowsWhenTaskIsAlreadyDetailOfNewParentTask() {
+        int taskId = 1;
+        int newParentTaskId = 2;
 
-        int parentTaskIdOfSource = destinationId;
+        int currentParentTaskId = newParentTaskId;
 
-        Task sourceTask = createTask(PROJECT_ID);
-        sourceTask.setParentTaskId(parentTaskIdOfSource);
-        Mockito.when(tasksDao.getById(sourceId)).thenReturn(sourceTask);
+        Task task = createTask(PROJECT_ID);
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        Task destinationTask = spy(createTask(PROJECT_ID));
-        Mockito.when(tasksDao.getById(destinationId)).thenReturn(destinationTask);
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        Mockito.when(destinationTask.getDetails()).thenReturn(new ArrayList<>());
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(sourceId, destinationId);
+        tasksService.moveTask(taskId, newParentTaskId);
     }
 
     @Test
@@ -972,13 +1034,13 @@ public class TasksServiceTest {
 
         try {
             tasksService.moveTask(-1, validTaskId);
-            fail("Negative source id should throw an exception");
+            fail("Negative task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
             tasksService.moveTask(validTaskId, -1);
-            fail("Negative destination id should throw an exception");
+            fail("Negative new parent task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
@@ -990,7 +1052,7 @@ public class TasksServiceTest {
 
         try {
             tasksService.moveTask(-1, -1);
-            fail("Negative destination and source id should throw an exception");
+            fail("Negative new parent task id and task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
     }

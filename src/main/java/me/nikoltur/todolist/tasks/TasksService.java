@@ -97,14 +97,14 @@ public interface TasksService {
     public void uncompleteTask(int taskId);
 
     /**
-     * Moves the source task to be a detail of the destination task.
+     * Changes the parent task id of the specified task to the specified new parent task id.
      *
-     * @param sourceId Id of the source task.
-     * @param destinationId Id of the destination task.
-     * @throws TaskDoesNotExistException Thrown if the specified source or destination task does not exist.
-     * @throws IllegalArgumentException Thrown if the specified sourceId or destinationId is negative or zero.
-     * Or if the source id is equal to destinationId.
-     * Or if the parent task id of the source task is equal to destinationId.
+     * @param taskId Id of the task to be moved.
+     * @param newParentTaskId New parent task id for the task to be moved.
+     * @throws TaskDoesNotExistException Thrown if the specified task to be moved or the new parent task does not exist.
+     * @throws IllegalArgumentException Thrown if the specified taskId or newParentTaskId is negative or zero.
+     * Or if the taskId is equal to newParentTaskId.
+     * Or if the parent task id of the task to be moved is equal to the specified newParentTaskId.
      */
-    public void moveTask(int sourceId, int destinationId);
+    public void moveTask(int taskId, int newParentTaskId);
 }
