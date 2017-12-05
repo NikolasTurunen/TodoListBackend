@@ -109,4 +109,15 @@ public class TasksResource {
     public void uncompleteTask(@RequestParam("taskId") int taskId) {
         tasksService.uncompleteTask(taskId);
     }
+
+    /**
+     * Moves the specified task to be a detail of the specified new parent task.
+     *
+     * @param taskId Id of the task to be moved.
+     * @param newParentTaskId Id of the new parent task for the task to be moved.
+     */
+    @PostMapping(BASE_PATH + "/move")
+    public void moveTask(@RequestParam("taskId") int taskId, @RequestParam("newParentTaskId") int newParentTaskId) {
+        tasksService.moveTask(taskId, newParentTaskId);
+    }
 }

@@ -114,4 +114,14 @@ public class TasksResourceTest {
 
         Mockito.verify(tasksService).uncompleteTask(taskId);
     }
+
+    @Test
+    public void testMoveTask() {
+        int taskId = 1;
+        int newParentTaskId = 2;
+
+        tasksResource.moveTask(taskId, newParentTaskId);
+
+        Mockito.verify(tasksService).moveTask(taskId, newParentTaskId);
+    }
 }
