@@ -251,7 +251,8 @@ public class TasksServiceImpl implements TasksService {
     }
 
     @Override
-    public void moveTask(int taskId, int newParentTaskId) {
+    @Transactional(rollbackOn = Exception.class)
+    public synchronized void moveTask(int taskId, int newParentTaskId) {
         validateTaskId(taskId);
         validateTaskId(newParentTaskId);
 

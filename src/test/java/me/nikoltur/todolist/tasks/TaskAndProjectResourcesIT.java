@@ -386,6 +386,24 @@ public class TaskAndProjectResourcesIT {
         Assert.assertFalse("Task should not be completed", completedTask.isCompleted());
     }
 
+    @Test
+    public void testMoveTask() {
+        Project project = createProject("Project");
+        Task task = createTask(project.getId(), "Task to be moved");
+
+        Task newParentTask = createTask(project.getId(), "New parent");
+
+        tasksResource.moveTask(task.getId(), newParentTask.getId());
+
+        List<Task> tasks = tasksResource.getTasks(project.getId());
+        Assert.assertEquals("Tasks should only contain one task after the other one is moved", 1, tasks.size());
+
+        Task updatedTask = tasks.get(0);
+        Assert.assertEquals("There should be 1 task detail under the single task", 1, updatedTask.getDetails().size());
+        System.out.println(updatedTask.getDetails().get(0).getTaskString());
+        Assert.assertSame("The single task detail should be the task that was moved", task.getId(), updatedTask.getDetails().get(0).getId());
+    }
+
     /**
      * Creates a project with the specified name and returns the created project.
      *
