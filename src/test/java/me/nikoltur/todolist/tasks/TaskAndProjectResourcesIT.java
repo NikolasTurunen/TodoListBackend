@@ -400,7 +400,7 @@ public class TaskAndProjectResourcesIT {
 
         Task updatedTask = tasks.get(0);
         Assert.assertEquals("There should be 1 task detail under the single task", 1, updatedTask.getDetails().size());
-        System.out.println(updatedTask.getDetails().get(0).getTaskString());
+
         Assert.assertSame("The single task detail should be the task that was moved", task.getId(), updatedTask.getDetails().get(0).getId());
     }
 
