@@ -767,9 +767,11 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task task = createTask(PROJECT_ID);
+        Task task = spy(createTask(PROJECT_ID));
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
 
         Task newParentTask = spy(createTask(PROJECT_ID));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
@@ -800,9 +802,11 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task task = createTask(PROJECT_ID);
+        Task task = spy(createTask(PROJECT_ID));
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
 
         Task newParentTask = spy(createTask(projectId2));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
@@ -831,9 +835,12 @@ public class TasksServiceTest {
         ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
         Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
 
-        Task task = createTask(PROJECT_ID);
+        Task task = spy(createTask(PROJECT_ID));
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
         Task newParentTask = spy(createTask(PROJECT_ID));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
@@ -867,10 +874,12 @@ public class TasksServiceTest {
 
         int currentParentTaskId = 3;
 
-        Task task = createTask(PROJECT_ID);
+        Task task = spy(createTask(PROJECT_ID));
         task.setPosition(1);
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
 
         Task newParentTask = spy(createTask(PROJECT_ID));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
@@ -918,9 +927,11 @@ public class TasksServiceTest {
 
         Integer currentParentTaskId = null;
 
-        Task task = createTask(PROJECT_ID);
+        Task task = spy(createTask(PROJECT_ID));
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
 
         Task newParentTask = spy(createTask(PROJECT_ID));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
@@ -932,6 +943,34 @@ public class TasksServiceTest {
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
         Assert.assertEquals("Parent task id of the saved task should be updated to the new parent task id", newParentTaskId, (int) savedTask.getParentTaskId());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testMoveTaskThrowsIfTheNewParentTaskIsDetailOfTaskLowerInHierarchy() {
+        int taskId = 1;
+        int newParentTaskId = 2;
+
+        Task task = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Task detailOfTask = spy(createTask(PROJECT_ID));
+
+        List<Task> detailsOfTask = new ArrayList<>();
+        detailsOfTask.add(detailOfTask);
+
+        Mockito.when(task.getDetails()).thenReturn(detailsOfTask);
+
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
+
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        List<Task> detailsOfDetail = new ArrayList<>();
+        detailsOfDetail.add(newParentTask);
+
+        Mockito.when(detailOfTask.getDetails()).thenReturn(detailsOfDetail);
+
+        tasksService.moveTask(taskId, newParentTaskId);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -977,9 +1016,11 @@ public class TasksServiceTest {
 
         int currentParentTaskId = newParentTaskId;
 
-        Task task = createTask(PROJECT_ID);
+        Task task = spy(createTask(PROJECT_ID));
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
 
         Task newParentTask = spy(createTask(PROJECT_ID));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);

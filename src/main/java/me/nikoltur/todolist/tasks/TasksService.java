@@ -105,6 +105,7 @@ public interface TasksService {
      * @throws IllegalArgumentException Thrown if the specified taskId or newParentTaskId is negative or zero.
      * Or if the taskId is equal to newParentTaskId.
      * Or if the parent task id of the task to be moved is equal to the specified newParentTaskId.
+     * Or if the parent task id is a detail of the task lower in the hierarchy.
      */
     public void moveTask(int taskId, int newParentTaskId);
 }

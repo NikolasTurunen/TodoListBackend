@@ -269,6 +269,10 @@ public class TasksServiceImpl implements TasksService {
             throw new TaskDoesNotExistException("No task with id " + newParentTaskId + " exists");
         }
 
+        if (isTaskLowerInHierarchy(task, newParentTask)) {
+            throw new IllegalArgumentException("The new parent task cannot be a detail of the task lower in the hierarchy");
+        }
+
         if (task.getParentTaskId() != null) {
             if (task.getParentTaskId() == newParentTaskId) {
                 throw new IllegalArgumentException("Task is already a detail of destination");
@@ -282,6 +286,20 @@ public class TasksServiceImpl implements TasksService {
         task.setPosition(newParentTask.getDetails().size());
 
         tasksDao.save(task);
+    }
+
+    private boolean isTaskLowerInHierarchy(Task task, Task taskSearched) {
+        for (Task detail : task.getDetails()) {
+            if (taskSearched.getId() == detail.getId()) {
+                return true;
+            }
+
+            if (isTaskLowerInHierarchy(detail, taskSearched)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
