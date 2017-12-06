@@ -288,6 +288,13 @@ public class TasksServiceImpl implements TasksService {
         tasksDao.save(task);
     }
 
+    /**
+     * Searches if the specified taskSearched is a detail of the specified task but lower in the hierarchy.
+     *
+     * @param task Task to start the search from.
+     * @param taskSearched Task to be searched lower in the hierarchy.
+     * @return true if the specified taskSearched is a detail of the specified task but lower in the hierarchy.
+     */
     private boolean isTaskLowerInHierarchy(Task task, Task taskSearched) {
         for (Task detail : task.getDetails()) {
             if (taskSearched.getId() == detail.getId()) {
