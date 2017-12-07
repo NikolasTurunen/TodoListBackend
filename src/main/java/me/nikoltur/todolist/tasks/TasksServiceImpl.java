@@ -275,7 +275,7 @@ public class TasksServiceImpl implements TasksService {
 
         if (task.getParentTaskId() != null) {
             if (task.getParentTaskId() == newParentTaskId) {
-                throw new IllegalArgumentException("Task is already a detail of destination");
+                throw new IllegalArgumentException("Task is already a detail of the new parent task");
             }
 
             decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getById(task.getParentTaskId()).getDetails());

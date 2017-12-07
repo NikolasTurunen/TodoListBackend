@@ -844,11 +844,11 @@ public class TasksServiceTest {
         Task newParentTask = spy(createTask(PROJECT_ID));
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        List<Task> detailsOfDestinationTask = new ArrayList<>();
-        detailsOfDestinationTask.add(createTask(PROJECT_ID));
-        detailsOfDestinationTask.add(createTask(PROJECT_ID));
-        detailsOfDestinationTask.add(createTask(PROJECT_ID));
-        Mockito.when(newParentTask.getDetails()).thenReturn(detailsOfDestinationTask);
+        List<Task> detailsOfNewParentTask = new ArrayList<>();
+        detailsOfNewParentTask.add(createTask(PROJECT_ID));
+        detailsOfNewParentTask.add(createTask(PROJECT_ID));
+        detailsOfNewParentTask.add(createTask(PROJECT_ID));
+        Mockito.when(newParentTask.getDetails()).thenReturn(detailsOfNewParentTask);
 
         Task currentParentTask = mock(Task.class);
         Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
@@ -857,7 +857,7 @@ public class TasksServiceTest {
 
         tasksService.moveTask(taskId, newParentTaskId);
 
-        int expectedPosition = detailsOfDestinationTask.size();
+        int expectedPosition = detailsOfNewParentTask.size();
 
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
