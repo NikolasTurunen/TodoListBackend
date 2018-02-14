@@ -101,11 +101,12 @@ public interface TasksService {
      *
      * @param taskId Id of the task to be moved.
      * @param newParentTaskId New parent task id for the task to be moved.
-     * @throws TaskDoesNotExistException Thrown if the specified task to be moved or the new parent task does not exist.
+     * @throws TaskDoesNotExistException Thrown if the specified task to be moved or the new parent task (if not null) does not exist.
+     * @throws TaskDoesNotHaveParentException Thrown if the new parent task is null and the specified task to be moved does not have a parent.
      * @throws IllegalArgumentException Thrown if the specified taskId or newParentTaskId is negative or zero.
      * Or if the taskId is equal to newParentTaskId.
      * Or if the parent task id of the task to be moved is equal to the specified newParentTaskId.
      * Or if the parent task id is a detail of the task lower in the hierarchy.
      */
-    public void moveTask(int taskId, int newParentTaskId);
+    public void moveTask(int taskId, Integer newParentTaskId);
 }

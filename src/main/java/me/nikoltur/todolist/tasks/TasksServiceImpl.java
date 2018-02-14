@@ -252,38 +252,51 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public synchronized void moveTask(int taskId, int newParentTaskId) {
+    public synchronized void moveTask(int taskId, Integer newParentTaskId) {
         validateTaskId(taskId);
-        validateTaskId(newParentTaskId);
-
-        if (taskId == newParentTaskId) {
-            throw new IllegalArgumentException("Cannot move task to be a detail of itself");
-        }
 
         Task task = tasksDao.getById(taskId);
         if (task == null) {
             throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
         }
-        Task newParentTask = tasksDao.getById(newParentTaskId);
-        if (newParentTask == null) {
-            throw new TaskDoesNotExistException("No task with id " + newParentTaskId + " exists");
-        }
 
-        if (isTaskLowerInHierarchy(task, newParentTask)) {
-            throw new IllegalArgumentException("The new parent task cannot be a detail of the task lower in the hierarchy");
-        }
+        int newPosition;
+        if (newParentTaskId != null) {
+            if (taskId == newParentTaskId) {
+                throw new IllegalArgumentException("Cannot move task to be a detail of itself");
+            }
 
-        if (task.getParentTaskId() != null) {
-            if (task.getParentTaskId() == newParentTaskId) {
+            validateTaskId(newParentTaskId);
+            Task newParentTask = tasksDao.getById(newParentTaskId);
+            if (newParentTask == null) {
+                throw new TaskDoesNotExistException("No task with id " + newParentTaskId + " exists");
+            }
+
+            if (isTaskLowerInHierarchy(task, newParentTask)) {
+                throw new IllegalArgumentException("The new parent task cannot be a detail of the task lower in the hierarchy");
+            }
+
+            if (task.getParentTaskId() != null && task.getParentTaskId() == (int) newParentTaskId) {
                 throw new IllegalArgumentException("Task is already a detail of the new parent task");
             }
 
+            task.setProjectId(newParentTask.getProjectId());
+            newPosition = newParentTask.getDetails().size();
+        } else {
+            if (task.getParentTaskId() == null) {
+                throw new TaskDoesNotHaveParentException("Task does not have a parent task to clear");
+            }
+
+            List<Task> tasksOfProject = tasksDao.getAllOf(task.getProjectId());
+            newPosition = tasksOfProject.size();
+        }
+
+        if (task.getParentTaskId() != null) {
             decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getById(task.getParentTaskId()).getDetails());
         }
 
         task.setParentTaskId(newParentTaskId);
-        task.setProjectId(newParentTask.getProjectId());
-        task.setPosition(newParentTask.getDetails().size());
+        task.setPosition(newPosition);
 
         tasksDao.save(task);
     }
