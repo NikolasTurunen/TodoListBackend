@@ -115,9 +115,10 @@ public class TasksResource {
      *
      * @param taskId Id of the task to be moved.
      * @param newParentTaskId Id of the new parent task for the task to be moved.
+     * @param newProjectId Id of the new project id for the task if the newParentTaskId is null. Null to keep the project id unchanged.
      */
     @PostMapping(BASE_PATH + "/move")
-    public void moveTask(@RequestParam("taskId") int taskId, @RequestParam("newParentTaskId") Integer newParentTaskId) {
-        tasksService.moveTask(taskId, newParentTaskId);
+    public void moveTask(@RequestParam("taskId") int taskId, @RequestParam("newParentTaskId") Integer newParentTaskId, @RequestParam(name = "newProjectId", required = false) Integer newProjectId) {
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
     }
 }

@@ -119,9 +119,10 @@ public class TasksResourceTest {
     public void testMoveTask() {
         int taskId = 1;
         int newParentTaskId = 2;
+        int newProjectId = 3;
 
-        tasksResource.moveTask(taskId, newParentTaskId);
+        tasksResource.moveTask(taskId, newParentTaskId, newProjectId);
 
-        Mockito.verify(tasksService).moveTask(taskId, newParentTaskId);
+        Mockito.verify(tasksService).moveTask(taskId, newParentTaskId, newProjectId);
     }
 }

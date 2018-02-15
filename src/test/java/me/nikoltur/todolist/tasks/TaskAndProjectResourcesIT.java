@@ -393,7 +393,7 @@ public class TaskAndProjectResourcesIT {
 
         Task newParentTask = createTask(project.getId(), "New parent");
 
-        tasksResource.moveTask(task.getId(), newParentTask.getId());
+        tasksResource.moveTask(task.getId(), newParentTask.getId(), null);
 
         List<Task> tasks = tasksResource.getTasks(project.getId());
         Assert.assertEquals("Tasks should only contain one task after the other one is moved", 1, tasks.size());

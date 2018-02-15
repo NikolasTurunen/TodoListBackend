@@ -783,11 +783,222 @@ public class TasksServiceTest {
 
         Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
         Assert.assertEquals("Parent task id of the saved task should be updated to the new parent task id", newParentTaskId, (int) savedTask.getParentTaskId());
+    }
+
+    @Test
+    public void testMoveTaskUpdatesProjectIdWithNullNewParentTaskId() {
+        int taskId = 1;
+        Integer newParentTaskId = null;
+        int newProjectId = 5;
+
+        int currentParentTaskId = 3;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
+
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        Project newProject = mock(Project.class);
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(newProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertSame("The moved task should be saved", task, savedTask);
+        Assert.assertEquals("Project id of the specified task should be changed", newProjectId, (int) savedTask.getProjectId());
+    }
+
+    @Test
+    public void testMoveTaskUpdatesProjectIdOfTaskWithNullParentTaskId() {
+        int taskId = 1;
+        Integer newParentTaskId = null;
+        int newProjectId = 5;
+
+        Integer currentParentTaskId = null;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
+        Project newProject = mock(Project.class);
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(newProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertSame("The moved task should be saved", task, savedTask);
+        Assert.assertEquals("Project id of the specified task should be changed", newProjectId, (int) savedTask.getProjectId());
+    }
+
+    @Test
+    public void testMoveTaskDoesNotUpdateProjectIdWithNonNullNewParentTaskId() {
+        int taskId = 1;
+        int newParentTaskId = 2;
+        int newProjectId = 5;
+
+        int currentParentTaskId = 3;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
+
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
+
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        Project newProject = mock(Project.class);
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(newProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertEquals("Project id of the specified task should be unchanged", PROJECT_ID, (int) savedTask.getProjectId());
+    }
+
+    @Test
+    public void testMoveTaskWithNewProjectIdUpdatesPositionsOfTasksWithHigherPositionAtOldLocation() {
+        int taskId = 1;
+        Integer newParentTaskId = null;
+
+        int newProjectId = 5;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setPosition(1);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
+        List<Task> tasksOfProject = new ArrayList<>();
+        tasksOfProject.add(createTask(PROJECT_ID));
+        tasksOfProject.add(createTask(PROJECT_ID));
+        tasksOfProject.add(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getAllOf(PROJECT_ID)).thenReturn(tasksOfProject);
+
+        List<Task> tasksOfCurrentProject = new ArrayList<>();
+        Task task1 = createTask(PROJECT_ID);
+        task1.setPosition(0);
+        tasksOfCurrentProject.add(task1);
+        tasksOfCurrentProject.add(task);
+        Task task2 = createTask(PROJECT_ID);
+        task2.setPosition(2);
+        tasksOfCurrentProject.add(task2);
+        Task task3 = createTask(PROJECT_ID);
+        task3.setPosition(3);
+        tasksOfCurrentProject.add(task3);
+        Mockito.when(tasksDao.getAllOf(PROJECT_ID)).thenReturn(tasksOfCurrentProject);
+
+        Project newProject = mock(Project.class);
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(newProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
+
+        Assert.assertFalse("Task 1 should not be saved", savedTaskCaptor.getAllValues().contains(task1));
+        Assert.assertTrue("Task 2 should be saved", savedTaskCaptor.getAllValues().contains(task2));
+        Assert.assertTrue("Task 3 should be saved", savedTaskCaptor.getAllValues().contains(task3));
+
+        for (Task savedTask : savedTaskCaptor.getAllValues()) {
+            if (savedTask == task2) {
+                Assert.assertEquals("Position of task 2 should be updated to 1", 1, savedTask.getPosition());
+            } else if (savedTask == task3) {
+                Assert.assertEquals("Position of task 3 should be updated to 2", 2, savedTask.getPosition());
+            }
+        }
+    }
+
+    @Test
+    public void testMoveTaskWithNewProjectIdUpdatesPositionToLast() {
+        int taskId = 1;
+        Integer newParentTaskId = null;
+
+        int currentParentTaskId = 3;
+
+        int newProjectId = 5;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
+        List<Task> tasksOfProject = new ArrayList<>();
+        tasksOfProject.add(createTask(PROJECT_ID));
+        tasksOfProject.add(createTask(PROJECT_ID));
+        tasksOfProject.add(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getAllOf(newProjectId)).thenReturn(tasksOfProject);
+
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
+
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        Project newProject = mock(Project.class);
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(newProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
+
+        int expectedPosition = tasksOfProject.size();
+
+        Task savedTask = savedTaskCaptor.getValue();
+        Assert.assertSame("The moved task should be saved", task, savedTask);
+        Assert.assertEquals("Position of the saved task should be updated to be the last", expectedPosition, savedTask.getPosition());
+    }
+
+    @Test(expected = ProjectDoesNotExistException.class)
+    public void testMoveTaskThrowsForNonExistantNonNullNewProjectIdWithNullNewParentTaskId() {
+        int taskId = 1;
+        Integer newParentTaskId = null;
+        int newProjectId = 5;
+
+        int currentParentTaskId = 3;
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
+
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(null);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
     }
 
     @Test
@@ -811,7 +1022,7 @@ public class TasksServiceTest {
 
         Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
@@ -845,7 +1056,7 @@ public class TasksServiceTest {
 
         Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         int expectedPosition = tasksOfProject.size();
 
@@ -893,7 +1104,7 @@ public class TasksServiceTest {
         detailsOfParentTaskOfSource.add(task3);
         Mockito.when(currentParentTask.getDetails()).thenReturn(detailsOfParentTaskOfSource);
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         Assert.assertFalse("Task 1 should not be saved", savedTaskCaptor.getAllValues().contains(task1));
         Assert.assertTrue("Task 2 should be saved", savedTaskCaptor.getAllValues().contains(task2));
@@ -919,7 +1130,7 @@ public class TasksServiceTest {
         task.setParentTaskId(currentParentTaskId);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
     }
 
     @Test
@@ -950,7 +1161,7 @@ public class TasksServiceTest {
 
         Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
@@ -987,7 +1198,7 @@ public class TasksServiceTest {
 
         Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         int expectedPosition = detailsOfNewParentTask.size();
 
@@ -1034,7 +1245,54 @@ public class TasksServiceTest {
         detailsOfParentTaskOfSource.add(task3);
         Mockito.when(currentParentTask.getDetails()).thenReturn(detailsOfParentTaskOfSource);
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
+
+        Assert.assertFalse("Task 1 should not be saved", savedTaskCaptor.getAllValues().contains(task1));
+        Assert.assertTrue("Task 2 should be saved", savedTaskCaptor.getAllValues().contains(task2));
+        Assert.assertTrue("Task 3 should be saved", savedTaskCaptor.getAllValues().contains(task3));
+
+        for (Task savedTask : savedTaskCaptor.getAllValues()) {
+            if (savedTask == task2) {
+                Assert.assertEquals("Position of task 2 should be updated to 1", 1, savedTask.getPosition());
+            } else if (savedTask == task3) {
+                Assert.assertEquals("Position of task 3 should be updated to 2", 2, savedTask.getPosition());
+            }
+        }
+    }
+
+    @Test
+    public void testMoveTaskWithNoParentTaskUpdatesPositionsOfTasksWithHigherPositionAtOldLocation() {
+        int taskId = 1;
+        int newParentTaskId = 2;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setPosition(1);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        Mockito.when(task.getDetails()).thenReturn(new ArrayList<>());
+
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
+
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        List<Task> tasksOfCurrentProject = new ArrayList<>();
+        Task task1 = createTask(PROJECT_ID);
+        task1.setPosition(0);
+        tasksOfCurrentProject.add(task1);
+        tasksOfCurrentProject.add(task);
+        Task task2 = createTask(PROJECT_ID);
+        task2.setPosition(2);
+        tasksOfCurrentProject.add(task2);
+        Task task3 = createTask(PROJECT_ID);
+        task3.setPosition(3);
+        tasksOfCurrentProject.add(task3);
+        Mockito.when(tasksDao.getAllOf(PROJECT_ID)).thenReturn(tasksOfCurrentProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         Assert.assertFalse("Task 1 should not be saved", savedTaskCaptor.getAllValues().contains(task1));
         Assert.assertTrue("Task 2 should be saved", savedTaskCaptor.getAllValues().contains(task2));
@@ -1070,7 +1328,7 @@ public class TasksServiceTest {
 
         Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
 
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
@@ -1102,7 +1360,7 @@ public class TasksServiceTest {
 
         Mockito.when(detailOfTask.getDetails()).thenReturn(detailsOfDetail);
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1112,7 +1370,7 @@ public class TasksServiceTest {
         Task task = createTask(PROJECT_ID);
         Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
 
-        tasksService.moveTask(taskId, taskId);
+        tasksService.moveTask(taskId, taskId, null);
     }
 
     @Test(expected = TaskDoesNotExistException.class)
@@ -1125,7 +1383,7 @@ public class TasksServiceTest {
         Task newParentTask = createTask(PROJECT_ID);
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
     }
 
     @Test(expected = TaskDoesNotExistException.class)
@@ -1138,7 +1396,7 @@ public class TasksServiceTest {
 
         Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(null);
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -1159,7 +1417,7 @@ public class TasksServiceTest {
 
         Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
 
-        tasksService.moveTask(taskId, newParentTaskId);
+        tasksService.moveTask(taskId, newParentTaskId, null);
     }
 
     @Test
@@ -1170,25 +1428,25 @@ public class TasksServiceTest {
         Mockito.when(tasksDao.getById(validTaskId)).thenReturn(task);
 
         try {
-            tasksService.moveTask(-1, validTaskId);
+            tasksService.moveTask(-1, validTaskId, null);
             fail("Negative task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            tasksService.moveTask(validTaskId, -1);
+            tasksService.moveTask(validTaskId, -1, null);
             fail("Negative new parent task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            tasksService.moveTask(0, validTaskId);
+            tasksService.moveTask(0, validTaskId, null);
             fail("Zero task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }
 
         try {
-            tasksService.moveTask(-1, -1);
+            tasksService.moveTask(-1, -1, null);
             fail("Negative new parent task id and task id should throw an exception");
         } catch (IllegalArgumentException ex) {
         }

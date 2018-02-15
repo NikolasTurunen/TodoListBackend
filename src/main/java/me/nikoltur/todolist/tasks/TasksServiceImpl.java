@@ -252,13 +252,15 @@ public class TasksServiceImpl implements TasksService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public synchronized void moveTask(int taskId, Integer newParentTaskId) {
+    public synchronized void moveTask(int taskId, Integer newParentTaskId, Integer newProjectId) {
         validateTaskId(taskId);
 
         Task task = tasksDao.getById(taskId);
         if (task == null) {
             throw new TaskDoesNotExistException("No task with id " + taskId + " exists");
         }
+
+        int currentProjectId = task.getProjectId();
 
         int newPosition;
         if (newParentTaskId != null) {
@@ -283,16 +285,30 @@ public class TasksServiceImpl implements TasksService {
             task.setProjectId(newParentTask.getProjectId());
             newPosition = newParentTask.getDetails().size();
         } else {
-            if (task.getParentTaskId() == null) {
+            if (newProjectId == null && task.getParentTaskId() == null) {
                 throw new TaskDoesNotHaveParentException("Task does not have a parent task to clear");
             }
 
-            List<Task> tasksOfProject = tasksDao.getAllOf(task.getProjectId());
-            newPosition = tasksOfProject.size();
+            if (newProjectId != null) {
+                Project newProject = projectsDao.getById(newProjectId);
+                if (newProject == null) {
+                    throw new ProjectDoesNotExistException("No project with the id " + newProjectId + " exists");
+                }
+
+                List<Task> tasksOfNewProject = tasksDao.getAllOf(newProjectId);
+                newPosition = tasksOfNewProject.size();
+
+                task.setProjectId(newProjectId);
+            } else {
+                List<Task> tasksOfProject = tasksDao.getAllOf(task.getProjectId());
+                newPosition = tasksOfProject.size();
+            }
         }
 
         if (task.getParentTaskId() != null) {
             decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getById(task.getParentTaskId()).getDetails());
+        } else {
+            decrementPositionsOfTasksWithHigherPosition(task.getPosition(), tasksDao.getAllOf(currentProjectId));
         }
 
         task.setParentTaskId(newParentTaskId);
