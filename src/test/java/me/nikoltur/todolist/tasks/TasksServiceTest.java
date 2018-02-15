@@ -979,6 +979,76 @@ public class TasksServiceTest {
         Assert.assertEquals("Position of the saved task should be updated to be the last", expectedPosition, savedTask.getPosition());
     }
 
+    @Test
+    public void testMoveTaskWithNewProjectIdUpdatesProjectIdsOfDetails() {
+        int taskId = 1;
+        Integer newParentTaskId = null;
+
+        int currentParentTaskId = 3;
+
+        int newProjectId = 5;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        List<Task> detailsOfTask = new ArrayList<>();
+        Task detail1 = spy(createTask(PROJECT_ID));
+        Mockito.when(detail1.getId()).thenReturn(1001);
+        Mockito.when(detail1.getDetails()).thenReturn(new ArrayList<>());
+        detailsOfTask.add(detail1);
+
+        Task detail2 = spy(createTask(PROJECT_ID));
+        Mockito.when(detail2.getId()).thenReturn(1002);
+        List<Task> nestedDetailsOfDetail2 = new ArrayList<>();
+
+        Task nestedDetail1 = spy(createTask(PROJECT_ID));
+        Mockito.when(nestedDetail1.getId()).thenReturn(1003);
+        Mockito.when(nestedDetail1.getDetails()).thenReturn(new ArrayList<>());
+        nestedDetailsOfDetail2.add(nestedDetail1);
+
+        Task nestedDetail2 = spy(createTask(PROJECT_ID));
+        Mockito.when(nestedDetail2.getId()).thenReturn(1004);
+        Mockito.when(nestedDetail2.getDetails()).thenReturn(new ArrayList<>());
+        nestedDetailsOfDetail2.add(nestedDetail2);
+        Mockito.when(detail2.getDetails()).thenReturn(nestedDetailsOfDetail2);
+        detailsOfTask.add(detail2);
+
+        Mockito.when(task.getDetails()).thenReturn(detailsOfTask);
+
+        List<Task> tasksOfProject = new ArrayList<>();
+        tasksOfProject.add(createTask(PROJECT_ID));
+        tasksOfProject.add(createTask(PROJECT_ID));
+        tasksOfProject.add(createTask(PROJECT_ID));
+        Mockito.when(tasksDao.getAllOf(newProjectId)).thenReturn(tasksOfProject);
+
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
+
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        Project newProject = mock(Project.class);
+        Mockito.when(projectsDao.getById(newProjectId)).thenReturn(newProject);
+
+        tasksService.moveTask(taskId, newParentTaskId, newProjectId);
+
+        List<Task> savedTasks = savedTaskCaptor.getAllValues();
+        Assert.assertTrue("Detail 1 should be saved", savedTasks.contains(detail1));
+        Assert.assertEquals("Project id of detail 1 should be updated", newProjectId, (int) detail1.getProjectId());
+
+        Assert.assertTrue("Detail 2 should be saved", savedTasks.contains(detail2));
+        Assert.assertEquals("Project id of detail 2 should be updated", newProjectId, (int) detail2.getProjectId());
+
+        Assert.assertTrue("Nested detail 1 should be saved", savedTasks.contains(nestedDetail1));
+        Assert.assertEquals("Project id of nested detail 1 should be updated", newProjectId, (int) nestedDetail1.getProjectId());
+
+        Assert.assertTrue("Nested detail 2 should be saved", savedTasks.contains(nestedDetail2));
+        Assert.assertEquals("Project id of nested detail 2 should be updated", newProjectId, (int) nestedDetail2.getProjectId());
+    }
+
     @Test(expected = ProjectDoesNotExistException.class)
     public void testMoveTaskThrowsForNonExistantNonNullNewProjectIdWithNullNewParentTaskId() {
         int taskId = 1;
@@ -1333,6 +1403,73 @@ public class TasksServiceTest {
         Task savedTask = savedTaskCaptor.getValue();
         Assert.assertSame("The moved task should be saved", task, savedTask);
         Assert.assertEquals("Parent task id of the saved task should be updated to the new parent task id", newParentTaskId, (int) savedTask.getParentTaskId());
+    }
+
+    @Test
+    public void testMoveTaskWithNewParentTaskInDifferentProjectUpdatesProjectIdsOfDetails() {
+        int taskId = 1;
+        Integer newParentTaskId = 2;
+
+        int currentParentTaskId = 3;
+
+        ArgumentCaptor<Task> savedTaskCaptor = ArgumentCaptor.forClass(Task.class);
+        Mockito.doNothing().when(tasksDao).save(savedTaskCaptor.capture());
+
+        Task task = spy(createTask(PROJECT_ID));
+        task.setParentTaskId(currentParentTaskId);
+        Mockito.when(tasksDao.getById(taskId)).thenReturn(task);
+
+        List<Task> detailsOfTask = new ArrayList<>();
+        Task detail1 = spy(createTask(PROJECT_ID));
+        Mockito.when(detail1.getId()).thenReturn(1001);
+        Mockito.when(detail1.getDetails()).thenReturn(new ArrayList<>());
+        detailsOfTask.add(detail1);
+
+        Task detail2 = spy(createTask(PROJECT_ID));
+        Mockito.when(detail2.getId()).thenReturn(1002);
+        List<Task> nestedDetailsOfDetail2 = new ArrayList<>();
+
+        Task nestedDetail1 = spy(createTask(PROJECT_ID));
+        Mockito.when(nestedDetail1.getId()).thenReturn(1003);
+        Mockito.when(nestedDetail1.getDetails()).thenReturn(new ArrayList<>());
+        nestedDetailsOfDetail2.add(nestedDetail1);
+
+        Task nestedDetail2 = spy(createTask(PROJECT_ID));
+        Mockito.when(nestedDetail2.getId()).thenReturn(1004);
+        Mockito.when(nestedDetail2.getDetails()).thenReturn(new ArrayList<>());
+        nestedDetailsOfDetail2.add(nestedDetail2);
+        Mockito.when(detail2.getDetails()).thenReturn(nestedDetailsOfDetail2);
+        detailsOfTask.add(detail2);
+
+        Mockito.when(task.getDetails()).thenReturn(detailsOfTask);
+
+        Task currentParentTask = mock(Task.class);
+        Mockito.when(tasksDao.getById(currentParentTaskId)).thenReturn(currentParentTask);
+
+        Mockito.when(currentParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        int projectIdOfNewParentTask = 5;
+
+        Task newParentTask = spy(createTask(PROJECT_ID));
+        Mockito.when(newParentTask.getProjectId()).thenReturn(projectIdOfNewParentTask);
+        Mockito.when(tasksDao.getById(newParentTaskId)).thenReturn(newParentTask);
+
+        Mockito.when(newParentTask.getDetails()).thenReturn(new ArrayList<>());
+
+        tasksService.moveTask(taskId, newParentTaskId, null);
+
+        List<Task> savedTasks = savedTaskCaptor.getAllValues();
+        Assert.assertTrue("Detail 1 should be saved", savedTasks.contains(detail1));
+        Assert.assertEquals("Project id of detail 1 should be updated", projectIdOfNewParentTask, (int) detail1.getProjectId());
+
+        Assert.assertTrue("Detail 2 should be saved", savedTasks.contains(detail2));
+        Assert.assertEquals("Project id of detail 2 should be updated", projectIdOfNewParentTask, (int) detail2.getProjectId());
+
+        Assert.assertTrue("Nested detail 1 should be saved", savedTasks.contains(nestedDetail1));
+        Assert.assertEquals("Project id of nested detail 1 should be updated", projectIdOfNewParentTask, (int) nestedDetail1.getProjectId());
+
+        Assert.assertTrue("Nested detail 2 should be saved", savedTasks.contains(nestedDetail2));
+        Assert.assertEquals("Project id of nested detail 2 should be updated", projectIdOfNewParentTask, (int) nestedDetail2.getProjectId());
     }
 
     @Test(expected = IllegalArgumentException.class)

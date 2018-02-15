@@ -283,6 +283,9 @@ public class TasksServiceImpl implements TasksService {
             }
 
             task.setProjectId(newParentTask.getProjectId());
+
+            updateProjectIdsOfTasksLowerInHierarchy(task, newParentTask.getProjectId());
+
             newPosition = newParentTask.getDetails().size();
         } else {
             if (newProjectId == null && task.getParentTaskId() == null) {
@@ -299,6 +302,8 @@ public class TasksServiceImpl implements TasksService {
                 newPosition = tasksOfNewProject.size();
 
                 task.setProjectId(newProjectId);
+
+                updateProjectIdsOfTasksLowerInHierarchy(task, newProjectId);
             } else {
                 List<Task> tasksOfProject = tasksDao.getAllOf(task.getProjectId());
                 newPosition = tasksOfProject.size();
@@ -336,6 +341,21 @@ public class TasksServiceImpl implements TasksService {
         }
 
         return false;
+    }
+
+    /**
+     * Updates project ids of tasks lower in the hierarchy of the specified task to the specified new project id.
+     *
+     * @param task Task.
+     * @param newProjectId New project id for the tasks.
+     */
+    private void updateProjectIdsOfTasksLowerInHierarchy(Task task, int newProjectId) {
+        for (Task detail : task.getDetails()) {
+            detail.setProjectId(newProjectId);
+            tasksDao.save(detail);
+
+            updateProjectIdsOfTasksLowerInHierarchy(detail, newProjectId);
+        }
     }
 
     /**
