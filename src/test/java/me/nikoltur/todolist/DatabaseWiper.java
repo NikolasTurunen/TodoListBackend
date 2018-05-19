@@ -23,6 +23,8 @@ public class DatabaseWiper {
 
                 deleteProjects(session);
                 restartProjectsSequence(session);
+
+                session.getTransaction().commit();
             } catch (Exception ex) {
                 session.getTransaction().rollback();
                 throw new RuntimeException("Failed to wipe the database", ex);
