@@ -2,28 +2,20 @@ package me.nikoltur.todolist.tasks;
 
 import java.util.ArrayList;
 import java.util.List;
-import me.nikoltur.todolist.Application;
 import me.nikoltur.todolist.tasks.da.Task;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import static org.mockito.Mockito.times;
 import org.mockito.MockitoAnnotations;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 /**
  *
  * @author Nikolas Turunen
  */
-@RunWith(SpringRunner.class)
-@TestPropertySource("classpath:application.properties")
-@ContextConfiguration(classes = Application.class)
 public class TasksResourceTest {
 
     @InjectMocks
