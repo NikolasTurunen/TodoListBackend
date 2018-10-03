@@ -1,20 +1,25 @@
-Requirements:
-- PostgreSQL-database (other SQL-databases might work but are not tested)
+# Todo-List Backend
 
-Instructions:
+## Requirements:
+- Java installation
+- Maven installation
+- PostgreSQL-database
 
-Setting up the property files:
-1. Create new files named "application.properties" in the folders "src/main/resources/" and "src/test/resources/"
-2. Copy the contents from the file "application-example.properties" found in the same folders as the newly created files.
-3. Fill username and password in the newly created files.
-4. (Optional) Change the url of the database. Make sure that both property-files are not pointing to the same database because the database is going to be wiped during test runs.
+## Installing:
+1. Clone this repository
 
-Setting up the database:
-1. Create the databases as configured in the property files.
-2. Run create.sql on both databases.
+2. Build an executable JAR using Maven:
+```mvn install -DskipTests```
 
-Now all tests should pass and the backend should be ready to be started.
+3. Creating and initializing the database:
+   1. Create a PostgreSQL-database with the name ```todolist```
+   2. Run the ```create.sql```-file on the database
 
-Starting the backend:
-1. Open the project in NetBeans-IDE.
-2. Run the project.
+4. Configuration:
+   1. Navigate to src/main/resources
+   2. Rename ```application-example.properties``` to ```application.properties```
+   3. Edit the file to fill the missing database username and password.
+   4. If your PostgreSQL-database is not on localhost you will need to update the database url in the file as well.
+   
+## Running:
+To run the backend navigate to "target" folder and run: ```java -Dserver.port=8082 -jar TodoListBackend-0.5.2-spring-boot.jar```
