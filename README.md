@@ -1,5 +1,7 @@
 # Todo-List Backend
 
+<img src="projects-view.png" width="384"> <img src="tasks-view.png" width="384">
+
 ## Requirements:
 - Java installation
 - Maven installation
